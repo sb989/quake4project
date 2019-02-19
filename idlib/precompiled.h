@@ -221,7 +221,7 @@ class ThreadedAlloc;		// class that is only used to expand the AutoCrit template
 
 #endif // GAME_DLL
 #endif // !Q4SDK
-
+#include <stdlib.h>
 #include <malloc.h>							// no malloc.h on mac or unix
 #include <windows.h>						// for qgl.h
 

@@ -106,8 +106,8 @@ bool rvWeaponBlaster::UpdateAttack ( void ) {
 	if ( wsfl.attack && gameLocal.time >= nextAttackTime ) {
 		// Save the time which the fire button was pressed
 		if ( fireHeldTime == 0 ) {		
-			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-			fireHeldTime   = gameLocal.time;
+			nextAttackTime = gameLocal.time; + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
+			fireHeldTime = gameLocal.time;
 			viewModel->SetShaderParm ( BLASTER_SPARM_CHARGEGLOW, chargeGlow[0] );
 		}
 	}		
@@ -119,7 +119,7 @@ bool rvWeaponBlaster::UpdateAttack ( void ) {
 			SetState ( "Charge", 4 );
 			return true;
 		}
-
+		
 		// If the fire button was let go but was pressed at one point then 
 		// release the shot.
 		if ( !wsfl.attack ) {
