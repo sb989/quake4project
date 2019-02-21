@@ -3,6 +3,7 @@
 
 #include "../Game_local.h"
 #include "../Weapon.h"
+#include "../spawner.h"
 
 class rvWeaponMachinegun : public rvWeapon {
 public:
@@ -17,7 +18,7 @@ public:
 	void				Restore				( idRestoreGame *savefile );
 	void					PreSave				( void );
 	void					PostSave			( void );
-
+	
 protected:
 
 	float				spreadZoom;
@@ -53,6 +54,7 @@ rvWeaponMachinegun::Spawn
 ================
 */
 void rvWeaponMachinegun::Spawn ( void ) {
+	
 	spreadZoom = spawnArgs.GetFloat ( "spreadZoom" );
 	fireHeld   = false;
 		

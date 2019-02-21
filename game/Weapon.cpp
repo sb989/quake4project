@@ -2448,9 +2448,9 @@ rvWeapon::UseAmmo
 ================
 */
 void rvWeapon::UseAmmo ( int amount ) {
-	//owner->inventory.UseAmmo( ammoType, amount * ammoRequired );
+	owner->inventory.UseAmmo( ammoType, amount * ammoRequired );
 	if ( clipSize && ammoRequired ) {
-		ammoClip += ( amount * ammoRequired );
+		ammoClip -= ( amount * ammoRequired );
 		if ( ammoClip < 0 ) {
 			ammoClip = 0;
 		}
