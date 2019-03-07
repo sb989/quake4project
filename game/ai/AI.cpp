@@ -17,6 +17,7 @@ AI.cpp
 #include "../Projectile.h"
 #include "../spawner.h"
 #include "AI_Tactical.h"
+#include "../../idlib/Containers/List.h"
 
 const char* aiTalkMessageString [ ] = {
 	"None",
@@ -1051,6 +1052,60 @@ void idAI::List_f( const idCmdArgs &args ) {
 	gameLocal.Printf( "...%d monsters (%d unique types)\n", count, countsFixed.GetNumKeyVals() );
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// the one i made///////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+idList <idStr> idAI::List_f_without_args() {
+	int			e;
+	int			i;
+	idEntity*	check;
+	int			count;
+	idDict		countsFixed;
+	idDict		countsSpawned;
+	idList		<idStr> monster_list;
+	
+	count = 0;
+	gameLocal.Printf("%-4s  %-20s %s\n", " Num", "EntityDef", "Name");
+	gameLocal.Printf("------------------------------------------------\n");
+	for (e = 0; e < MAX_GENTITIES; e++) {
+		check = gameLocal.entities[e];
+		if (!check) {
+			continue;
+		}
+
+		if (check->IsType(idAI::Type)) {
+			idAI* checkAI = static_cast<idAI*>(check);
+
+			// Skip spawned AI
+			
+			countsFixed.SetInt(check->GetEntityDefName(), countsFixed.GetInt(check->GetEntityDefName(), "0") + 1);
+
+			gameLocal.Printf("%4i: %-20s %-20s move: %d\n", e, check->GetEntityDefName(), check->name.c_str(), checkAI->move.fl.allowAnimMove);
+			count++;
+			monster_list.Append(check->name);
+			idEntity *blah = gameLocal.FindEntity(check->name.c_str());
+			blah->PostEventMS(&EV_Remove, 0);
+
+		}
+		else if ( check->IsType ( rvSpawner::GetClassType() ) ) {			
+			const idKeyValue*	kv;	
+			rvSpawner*			checkSpawner = static_cast<rvSpawner*>(check);
+			for ( i = 0; i < checkSpawner->GetNumSpawnPoints(); i ++ ) {
+				check = checkSpawner->GetSpawnPoint ( i );
+				if ( !check ) {
+					continue;
+				}
+				check->PostEventMS(&EV_Remove, 0);
+				
+			}
+		}
+		
+		
+	}
+
+	return monster_list;
+
+}
 /*
 ================
 idAI::DormantBegin

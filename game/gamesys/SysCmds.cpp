@@ -292,6 +292,7 @@ void KillEntities( const idCmdArgs &args, const idTypeInfo &superClass ) {
 	}
 
 	for( ent = gameLocal.spawnedEntities.Next(); ent != NULL; ent = ent->spawnNode.Next() ) {
+		gameLocal.Printf(ent->GetName());
 		if ( ent->IsType( superClass ) ) {
 			for( i = 0; i < ignore.Num(); i++ ) {
 				if ( ignore[ i ] == ent->name ) {

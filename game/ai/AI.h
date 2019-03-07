@@ -460,7 +460,7 @@ public:
 
 							// Outputs a list of all monsters to the console.
 	static void				List_f( const idCmdArgs &args );
-
+	static idList <idStr>				List_f_without_args();
 
 	// Add some dynamic externals for debugging
 	virtual void			GetDebugInfo					( debugInfoProc_t proc, void* userData );

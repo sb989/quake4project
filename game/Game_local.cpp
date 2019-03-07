@@ -11,6 +11,10 @@
 #include "ai/AI_Manager.h"
 #include "ai/AAS_tactical.h"
 #include "Game_Log.h"
+#include "../idlib/containers/List.h"
+#include "spawner.h"
+
+
 // RAVEN END
 
 //#define UI_DEBUG	1
@@ -5277,6 +5281,42 @@ void idGameLocal::SpawnMapEntities( int instance, unsigned short* entityNumIn, u
 	}
 
 	Printf( "...%i entities spawned, %i inhibited\n\n", num, inhibit );
+	idAI list;
+	//idEntity * ent123;
+	//const idTypeInfo className1 [] = { idAI::GetClassType(),idProjectile::GetClassType(), rvSpawner::GetClassType()};
+
+	/*
+	for (int j = 0;j < 3;j++) {
+		for (ent123 = gameLocal.spawnedEntities.Next(); ent123 != NULL; ent123 = ent123->spawnNode.Next()) {
+			if (ent123->IsType(className1[j])) {
+				//Printf(ent123->GetEntityDefName());
+			}
+		}
+	}
+	*/
+	//idList<idStr> listOfMonsters = list.List_f_without_args();
+	//if (listOfMonsters.Num() >0) {
+		//gameLocal.Printf("--------------------111222333----------------------------\n");
+		/*for (int e = 0; e < listOfMonsters.Num(); e++) {
+			//const idKeyValue* kv = listOfMonsters.GetKeyVal(e);
+			idStr monster = listOfMonsters[e];
+			//gameLocal.Printf("%10s: %-20s\n", kv->GetValue().c_str(), kv->GetKey().c_str());
+			gameLocal.Printf("%s", monster);
+			idEntity *ent = gameLocal.FindEntity(monster);
+			
+
+			if (ent == NULL) {
+				gameLocal.Printf("FAILED");
+			}
+			//gameLocal.GetClientByCmdArgs.
+			//gameLocal.Printf("%-20s\n", ent->GetName());
+			//ent->PostEventMS(&EV_Remove, 0);
+		}*/
+	//}
+
+
+	
+
 }
 
 /*

@@ -830,6 +830,9 @@
     <ClInclude Include="game\mp\stats\StatWindow.h">
       <Filter>Game\MP\Stats</Filter>
     </ClInclude>
+    <ClInclude Include="WaveSpawn.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="game\Game.def" />
