@@ -1,4 +1,4 @@
 "Checkpoint1"
-"^:Checkpoint	^0AIR DEFENSE BUNKER"
+"^:Checkpoint	^0WASTE PROCESSING FACILITY"
 ""
 nooverwrite
