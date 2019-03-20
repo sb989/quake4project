@@ -516,6 +516,7 @@
     <ClCompile Include="game\mp\stats\StatWindow.cpp">
       <Filter>Game\MP\Stats</Filter>
     </ClCompile>
+    <ClCompile Include="WaveSpawn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h">
@@ -830,11 +831,10 @@
     <ClInclude Include="game\mp\stats\StatWindow.h">
       <Filter>Game\MP\Stats</Filter>
     </ClInclude>
-    <ClInclude Include="WaveSpawn.h">
-      <Filter>Game</Filter>
-    </ClInclude>
+    <ClInclude Include="WaveSpawn.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="game\Game.def" />
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>

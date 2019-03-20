@@ -1730,7 +1730,7 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 	RemoveAttachments();
 	RemoveProjectile();
 	StopMove( MOVE_STATUS_DONE );
-
+	gameLocal.Printf("Entering OnDeath\n");
 	OnDeath();
 	CheckDeathObjectives();
 
@@ -1787,7 +1787,7 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 	}
 
 	SetState ( "State_Killed" );
-
+	gameLocal.Printf("doing spawnargs thingy");
 	kv = spawnArgs.MatchPrefix( "def_drops", NULL );
 	while( kv ) {
 		idDict args;
@@ -3739,8 +3739,8 @@ void idAI::OnDeath( void ){
 
 	ExecScriptFunction( funcs.death );
 
-/* DONT DROP ANYTHING FOR NOW
-	float rVal = gameLocal.random.RandomInt( 100 );
+//DONT DROP ANYTHING FOR NOW
+	/*float rVal = gameLocal.random.RandomInt( 100 );
 
 	if( spawnArgs.GetFloat( "no_drops" ) >= 1.0 ){
 		spawnArgs.Set( "def_dropsItem1", "" );
@@ -3752,7 +3752,9 @@ void idAI::OnDeath( void ){
 			spawnArgs.Set( "def_dropsItem1", "item_health_small" );
 		}
 	}
-*/
+	*/
+	spawnArgs.Set("def_dropsItem1", "item_money");
+
 }
 
 /*

@@ -8,23 +8,40 @@
 
 
 
-void spawn_wave1(){
-	sys.spawn("monsters_strogg_marine");
 
-
-}
 namespace map_waste
-{
 
 //-------------------------------------------------------------------------------
 // Prep any level related things
 //
 // jdischler | Jan 2005
 //-------------------------------------------------------------------------------
-void main()
+
+
+
 {
-	//spawn_wave1();
+void spawn_wave1(){
+	
 	sys.trigger($waves_1);
+	
+}
+
+void base_health(){
+	float health = $base.getHealth();
+	sys.wait(50);
+	while(health>0)
+	{
+		sys.print(health);
+		health = $base.getHealth();
+	}	
+
+}
+void main()
+{	//thread base_health();
+	$base.becomePassive(1);
+	spawn_wave1();
+	
+	//sys.trigger($waves_1);
 }
 
 

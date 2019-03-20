@@ -1328,33 +1328,40 @@ void idGameLocal::LoadMap( const char *mapName, int randseed ) {
 // RAVEN BEGIN
 // rjohnson: added resolve for handling func_groups and other aspects.  Before, radiant would do this processing on a map destroying the original data
 		mapFile->Resolve();
+		Printf("finished resolve... havent died yet");
 // RAVEN END
 	}
 	mapFileName = mapFile->GetName();
-	
+	Printf("imhere1");
 	assert(!idStr::Cmp(mapFileName, mapFile->GetName()));
-	
+	Printf("\n the assert doesnt kill me");
 // RAVEN BEGIN
 // rjohnson: entity usage stats
+	Printf("\nb1");
 	mapFileNameStripped = mapFileName;
+	Printf("\nb2");
 	mapFileNameStripped.StripFileExtension();
+	Printf("\nb3");
 	mapFileNameStripped.StripPath();
-
+	Printf("\nb4");
 	const char*	entityFilter;
-
+	Printf("\nb5");
 	gameLocal.serverInfo.GetString( "si_entityFilter", "", &entityFilter );
+	Printf("\nb6");
 	if ( entityFilter && *entityFilter ) {
 		mapFileNameStripped += " ";
 		mapFileNameStripped += entityFilter;
 	}
+	Printf("\nafter if statement");
 // RAVEN END
 
 	// load the collision map
 	networkSystem->SetLoadingText( common->GetLocalizedString( "#str_107668" ) );
+	Printf("\ndead");
 	collisionModelManager->LoadMap( mapFile, false );
 
 	numClients = 0;
-
+	Printf("\n right before initializing enemies");
 	// initialize all entities for this game
 	memset( entities, 0, sizeof( entities ) );
 	usercmds = NULL;
@@ -5281,40 +5288,7 @@ void idGameLocal::SpawnMapEntities( int instance, unsigned short* entityNumIn, u
 	}
 
 	Printf( "...%i entities spawned, %i inhibited\n\n", num, inhibit );
-	idAI list;
-	//idEntity * ent123;
-	//const idTypeInfo className1 [] = { idAI::GetClassType(),idProjectile::GetClassType(), rvSpawner::GetClassType()};
-
-	/*
-	for (int j = 0;j < 3;j++) {
-		for (ent123 = gameLocal.spawnedEntities.Next(); ent123 != NULL; ent123 = ent123->spawnNode.Next()) {
-			if (ent123->IsType(className1[j])) {
-				//Printf(ent123->GetEntityDefName());
-			}
-		}
-	}
-	*/
-	//idList<idStr> listOfMonsters = list.List_f_without_args();
-	//if (listOfMonsters.Num() >0) {
-		//gameLocal.Printf("--------------------111222333----------------------------\n");
-		/*for (int e = 0; e < listOfMonsters.Num(); e++) {
-			//const idKeyValue* kv = listOfMonsters.GetKeyVal(e);
-			idStr monster = listOfMonsters[e];
-			//gameLocal.Printf("%10s: %-20s\n", kv->GetValue().c_str(), kv->GetKey().c_str());
-			gameLocal.Printf("%s", monster);
-			idEntity *ent = gameLocal.FindEntity(monster);
-			
-
-			if (ent == NULL) {
-				gameLocal.Printf("FAILED");
-			}
-			//gameLocal.GetClientByCmdArgs.
-			//gameLocal.Printf("%-20s\n", ent->GetName());
-			//ent->PostEventMS(&EV_Remove, 0);
-		}*/
-	//}
-
-
+	
 	
 
 }

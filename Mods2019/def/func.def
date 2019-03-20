@@ -923,16 +923,14 @@ entityDef func_jumppad {
 	"editor_bool start_on"		"By default the jumppad is on. If 'start_on' is set to '0' the jump pad starts off."
 }
 
-entityDef func_waves{
-
-
-	"spawnclass"				"WaveSpawn"
+/*entityDef func_waves{
+	
 	"editor_var number"			"Number to be spawned"
 	"editor_var location"		"location of where to spawn"
 	"editor_var monster"		"classname of the monster"
 	"editor_var angle"			"angle to be spawned at"
-
-}
+	"spawnclass"				"WaveSpawn"
+}*/
 // Keep for backwards compatibility
 entityDef func_spawner_enemy {
 	"spawnclass"					"rvSpawner"

@@ -206,6 +206,7 @@ void idInventory::Clear( void ) {
 	armor				= 0;
 	maxarmor			= 0;
 	secretAreasDiscovered = 0;
+	money = 0;
 
 	memset( ammo, 0, sizeof( ammo ) );
 
@@ -274,6 +275,9 @@ void idInventory::GetPersistantData( idDict &dict ) {
 
 	// armor
 	dict.SetInt( "armor", armor );
+	
+	//money
+	dict.SetInt("money", money);
 
 	// ammo
 	for( i = 0; i < MAX_AMMOTYPES; i++ ) {
@@ -339,7 +343,7 @@ void idInventory::RestoreInventory( idPlayer *owner, const idDict &dict ) {
 	maxHealth		= dict.GetInt( "maxhealth", "100" );
 	armor			= dict.GetInt( "armor", "50" );
 	maxarmor		= dict.GetInt( "maxarmor", "100" );
-
+	money = dict.GetInt("money");
 	// ammo
 	for( i = 0; i < MAX_AMMOTYPES; i++ ) {
 		name = rvWeapon::GetAmmoNameForIndex ( i );
@@ -404,7 +408,7 @@ void idInventory::Save( idSaveGame *savefile ) const {
 	savefile->WriteInt( powerups );
 	savefile->WriteInt( armor );
 	savefile->WriteInt( maxarmor );
-
+	savefile->WriteInt(money);
 	for( i = 0; i < MAX_AMMO; i++ ) {
 		savefile->WriteInt( ammo[ i ] );
 	}
@@ -484,7 +488,7 @@ void idInventory::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt( powerups );
 	savefile->ReadInt( armor );
 	savefile->ReadInt( maxarmor );
-
+	savefile->ReadInt(money);
 	for( i = 0; i < MAX_AMMO; i++ ) {
 		savefile->ReadInt( ammo[ i ] );
 	}
@@ -979,7 +983,11 @@ bool idInventory::Give( idPlayer *owner, const idDict &spawnArgs, const char *st
 	} else if ( !idStr::Icmp( statname, "item" ) || !idStr::Icmp( statname, "icon" ) || !idStr::Icmp( statname, "name" ) ) {
 		// ignore these as they're handled elsewhere
 		return false;
-	} else {
+	}
+	else if (!idStr::Icmp(statname, "money")) {
+	return true;
+	}
+	else {
 		// unknown item
 		gameLocal.Warning( "Unknown stat '%s' added to player's inventory", statname );
 		return false;
@@ -4092,7 +4100,12 @@ bool idPlayer::Give( const char *statname, const char *value, bool dropped ) {
  				health = boundaryHealth;
  			}
 		}
-	} else if ( !idStr::Icmp( statname, "bonushealth" ) ) {
+	} 
+	else if (!idStr::Icmp(statname, "money")) {
+		amount = atoi(value);
+		inventory.money += amount;
+	}
+	else if ( !idStr::Icmp( statname, "bonushealth" ) ) {
 		// allow health over max health
 		if ( health >= boundaryHealth * 2 ) {
 			return false;

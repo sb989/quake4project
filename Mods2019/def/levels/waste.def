@@ -238,15 +238,15 @@ entityDef waste_monster_berserker
 	"health"							"100"
 }
 
+entityDef item_money
+{
+	"editor_color"				".3 .3 1"
+	"editor_mins"				"-8 -8 0"
+	"editor_maxs"				"8 8 16"
+	"editor_rotatable"			"1"
+	"editor_menu"				"pickup"
 
-//model model_waste_spawn_wave
-//{
-//	inherit								model_monster_grunt
-//
-//}
-//entityDef waste_spawn_wave
-//{
-//	"inherit"							"waves_1"
-//	"model"								"model_wave"
-//	"editor_menu"						"level"
-//}
+	"spawnclass"				"idItem"
+	"model"					"models/mapobjects/strogg/barrels/stroyent_barrel_clip.lwo"
+	"size"					"32 32 32"
+}

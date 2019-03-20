@@ -31,6 +31,8 @@ class rvSpawner : public idEntity {
 public:
 	CLASS_PROTOTYPE( rvSpawner );
 
+	void				wave1					(void);
+
 	void				Spawn					( void );
 	void				Think					( void );
 
@@ -54,7 +56,7 @@ public:
 	void				CallScriptEvents		( const char* prefixKey, idEntity* parm );
 
 	void				AddCallback				( idEntity* owner, const idEventDef* ev );
-
+	idEntity*			GetSpawnPoint(void);
 protected:
 
 	int								numSpawned;
@@ -81,7 +83,7 @@ protected:
 	void				FindSpawnTypes			( void );
 
 	// Get a random spawnpoint to spawn at
-	idEntity*			GetSpawnPoint			( void );
+	
 	
 	// Get a random spawn type
 	const char*			GetSpawnType			( idEntity* spawnPoint );
