@@ -1350,6 +1350,57 @@ idPlayer::idPlayer() {
 	teamAmmoRegenPending	= false;
 	teamDoubler			= NULL;		
 	teamDoublerPending		= false;
+
+	buyMenu = gameLocal.mpGame.buyMenu;	//uiManager->FindGui("guis/buymenu.gui", true, false, true); //
+	buyMenu->SetStateString("field_credits", "0");
+	buyMenu->SetStateBool("gameDraw", true);
+	costs.SetInt("weapon_shotgun", 100);
+	buyMenu->SetStateInt("price_shotgun", GetItemCost("weapon_shotgun"));
+	buyMenu->SetStateInt("price_hyperblaster",  GetItemCost("weapon_hyperblaster"));
+	buyMenu->SetStateInt("price_grenadelauncher", GetItemCost("weapon_grenadelauncher"));
+	buyMenu->SetStateInt("price_nailgun", GetItemCost("weapon_nailgun"));
+	buyMenu->SetStateInt("price_rocketlauncher",  GetItemCost("weapon_rocketlauncher"));
+	buyMenu->SetStateInt("price_railgun",  GetItemCost("weapon_railgun"));
+	buyMenu->SetStateInt("price_lightninggun",GetItemCost("weapon_lightninggun"));
+	//			buyMenu->SetStateInt( "price_dmg", GetItemCost( "weapon_dmg" ) );
+	buyMenu->SetStateInt("price_napalmgun", GetItemCost("weapon_napalmgun"));
+
+	buyMenu->SetStateInt("price_lightarmor", GetItemCost("item_armor_small"));
+	buyMenu->SetStateInt("price_heavyarmor", GetItemCost("item_armor_large"));
+	buyMenu->SetStateInt("price_ammorefill", GetItemCost("ammorefill"));
+
+	buyMenu->SetStateInt("price_special0",  GetItemCost("ammo_regen"));
+	buyMenu->SetStateInt("price_special1", GetItemCost("health_regen"));
+	buyMenu->SetStateInt("price_special2", GetItemCost("damage_boost"));
+	buyMenu->SetStateInt("buyStatus_shotgun", ItemBuyStatus("weapon_shotgun") );
+	buyMenu->SetStateInt("buyStatus_hyperblaster", ItemBuyStatus( "weapon_hyperblaster" ) );
+	buyMenu->SetStateInt("buyStatus_grenadelauncher", ItemBuyStatus( "weapon_grenadelauncher" ) );
+	buyMenu->SetStateInt("buyStatus_nailgun", ItemBuyStatus( "weapon_nailgun" ) );
+	buyMenu->SetStateInt("buyStatus_rocketlauncher", ItemBuyStatus( "weapon_rocketlauncher" ) );
+	buyMenu->SetStateInt("buyStatus_railgun",  ItemBuyStatus( "weapon_railgun" ) );
+	buyMenu->SetStateInt("buyStatus_lightninggun", ItemBuyStatus( "weapon_lightninggun" ) );
+	//	buyMenu->SetStateInt( "buyStatus_dmg", ItemBuyStatus( "weapon_dmg" ) );
+	buyMenu->SetStateInt("buyStatus_napalmgun", ItemBuyStatus( "weapon_napalmgun" ) );
+
+	buyMenu->SetStateInt("buyStatus_lightarmor",  ItemBuyStatus( "item_armor_small" ) );
+	buyMenu->SetStateInt("buyStatus_heavyarmor", ItemBuyStatus( "item_armor_large" ) );
+	buyMenu->SetStateInt("buyStatus_ammorefill", ItemBuyStatus( "ammorefill" ) );
+
+	buyMenu->SetStateInt("buyStatus_special0", ItemBuyStatus( "ammo_regen" ) );
+	buyMenu->SetStateInt("buyStatus_special1", ItemBuyStatus( "health_regen" ) );
+	buyMenu->SetStateInt("buyStatus_special2", ItemBuyStatus( "damage_boost" ) );
+
+	buyMenu->SetStateInt("playerTeam", team );
+
+	if (weapon)
+		buyMenu->SetStateString("ammoIcon", weapon->spawnArgs.GetString("inv_icon"));
+
+	buyMenu->SetStateInt("player_weapon", GetCurrentWeapon());
+	//gameLocal.mpGame.SetupBuyMenuItems();
+	UpdateHudStats(buyMenu);
+	buyMenuCash = 0;
+	buyMenu->Activate(true,gameLocal.time);
+	mainMenu = gameLocal.mpGame.mainGui;
 }
 
 /*
@@ -1856,6 +1907,9 @@ void idPlayer::Spawn( void ) {
 
 		if ( spawnArgs.GetString( "hud", "", temp ) ) {
 			hud = uiManager->FindGui( temp, true, false, true );
+			//defaultHud = uiManager->FindGui(temp, true, false, true);
+			defaultHud = uiManager->FindGui("guis/hud.gui", true, false, true);
+			defaultHud->SetStateBool("gameDraw", true);
 		} else {
 			gameLocal.Warning( "idPlayer::Spawn() - No hud for player." );
 		}
@@ -4104,6 +4158,8 @@ bool idPlayer::Give( const char *statname, const char *value, bool dropped ) {
 	else if (!idStr::Icmp(statname, "money")) {
 		amount = atoi(value);
 		inventory.money += amount;
+		buyMenuCash = inventory.money;
+		gameLocal.Printf("buyMenuCash:%f", buyMenuCash);
 	}
 	else if ( !idStr::Icmp( statname, "bonushealth" ) ) {
 		// allow health over max health
@@ -4181,7 +4237,7 @@ bool idPlayer::GiveItem( idItem *item ) {
 	const idKeyValue	*arg;
 	idDict				attr;
 	bool				gave;
-	
+	gameLocal.Printf("giveitem\n");
 	bool dropped = item->spawnArgs.GetBool( "dropped" );
 
 	if ( gameLocal.isMultiplayer && spectating ) {
@@ -4279,8 +4335,10 @@ bool idPlayer::GiveItem( idItem *item ) {
 		hud->HandleNamedEvent ( "itemPickup" );
 	}
 //RITUAL BEGIN
-	if ( gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() )
+	if (gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode()) {
 		gameLocal.mpGame.RedrawLocalBuyMenu();
+		gameLocal.Printf("Redrawgamemenu\n");
+	}
 //RITUAL END
 
 	return gave;
@@ -5256,7 +5314,7 @@ void idPlayer::CompleteObjective( const char *title ) {
 
 	if ( objectiveSystemOpen ) {
 		objectiveSystemOpen = false;
-		ToggleObjectives ( );
+		//ToggleObjectives ( );
 #ifdef _XENON
 		g_ObjectiveSystemOpen = objectiveSystemOpen;
 #endif
@@ -7932,6 +7990,47 @@ idPlayer::ToggleObjectives
 void idPlayer::ToggleObjectives ( void ) {
 // RAVEN BEGIN
 // mekberg: allow disabling of objectives.
+	
+	gameLocal.Printf("toggleobj\n");
+	UpdateHudStats(buyMenu);
+	
+	//buyMenu->HandleNamedEvent("update_buymenu");
+	hud = buyMenu;
+	hud->SetStateString("field_credits", va("%i", (int)buyMenuCash));
+	
+	hud->SetStateInt("buyStatus_shotgun", ItemBuyStatus("weapon_shotgun"));
+	hud->SetStateInt("buyStatus_hyperblaster", ItemBuyStatus("weapon_hyperblaster"));
+	hud->SetStateInt("buyStatus_grenadelauncher", ItemBuyStatus("weapon_grenadelauncher"));
+	hud->SetStateInt("buyStatus_nailgun", ItemBuyStatus("weapon_nailgun"));
+	hud->SetStateInt("buyStatus_rocketlauncher", ItemBuyStatus("weapon_rocketlauncher"));
+	hud->SetStateInt("buyStatus_railgun", ItemBuyStatus("weapon_railgun"));
+	hud->SetStateInt("buyStatus_lightninggun", ItemBuyStatus("weapon_lightninggun"));
+	//	hud->SetStateInt( "buyStatus_dmg", ItemBuyStatus( "weapon_dmg" ) );
+	hud->SetStateInt("buyStatus_napalmgun", ItemBuyStatus("weapon_napalmgun"));
+
+	hud->SetStateInt("buyStatus_lightarmor", ItemBuyStatus("item_armor_small"));
+	hud->SetStateInt("buyStatus_heavyarmor", ItemBuyStatus("item_armor_large"));
+	hud->SetStateInt("buyStatus_ammorefill", ItemBuyStatus("ammorefill"));
+
+	hud->SetStateInt("buyStatus_special0", ItemBuyStatus("ammo_regen"));
+	hud->SetStateInt("buyStatus_special1", ItemBuyStatus("health_regen"));
+	hud->SetStateInt("buyStatus_special2", ItemBuyStatus("damage_boost"));
+
+	hud->SetStateInt("playerTeam", team);
+
+	if (weapon)
+		hud->SetStateString("ammoIcon", weapon->spawnArgs.GetString("inv_icon"));
+
+	hud->SetStateInt("player_weapon", GetCurrentWeapon());
+	//hud->Redraw(gameLocal.time);
+	
+	hud->Activate(true, gameLocal.time);
+	focusType = FOCUS_GUI;
+	focusUI = buyMenu;//hud;
+	
+	
+
+/*
 	if ( objectiveSystem == NULL || !objectivesEnabled ) {
 		return;
 	}
@@ -7978,6 +8077,7 @@ void idPlayer::ToggleObjectives ( void ) {
 		objectiveSystem->HandleNamedEvent( "wristcommHide" );
 	}
 	objectiveSystemOpen ^= 1;
+	*/
 }
 
 /*
@@ -8156,11 +8256,11 @@ GetItemCost
 ==============
 */
 int idPlayer::GetItemCost( const char* itemName ) {
-	if ( !itemCosts ) {
+	/*if ( !itemCosts ) {
 		assert( false );
 		return 99999;
-	}
-	return itemCosts->dict.GetInt( itemName, "99999" );
+	}*/
+	return costs.GetInt(itemName, "10");//itemCosts->dict.GetInt( itemName, "99999" );
 }
 
 /*
@@ -8281,14 +8381,7 @@ itemBuyStatus_t idPlayer::ItemBuyStatus( const char* itemName )
 		return IBS_NOT_ALLOWED;
 	}
 
-	if ( gameLocal.gameType == GAME_DM || gameLocal.gameType == GAME_TOURNEY || gameLocal.gameType == GAME_ARENA_CTF || gameLocal.gameType == GAME_1F_CTF || gameLocal.gameType == GAME_ARENA_1F_CTF ) {
-		if ( itemNameStr == "ammo_regen" )
-			return IBS_NOT_ALLOWED;
-		if ( itemNameStr == "health_regen" )
-			return IBS_NOT_ALLOWED;
-		if ( itemNameStr == "damage_boost" )
-			return IBS_NOT_ALLOWED;
-	}
+	
 
 	if ( CanSelectWeapon(itemName) != -1 )
 		return IBS_ALREADY_HAVE;
@@ -8383,9 +8476,9 @@ idPlayer::AttemptToBuyItem
 */
 bool idPlayer::AttemptToBuyItem( const char* itemName )
 {
-	if ( gameLocal.isClient ) {
+	/*if ( gameLocal.isClient ) {
 		return false;
-	}
+	}*/
 
 	if( !itemName ) {
 		return false;
@@ -8403,7 +8496,7 @@ bool idPlayer::AttemptToBuyItem( const char* itemName )
 	common->DPrintf( "Player %s about to buy item %s; player has %d (%g) credits, cost is %d\n", playerName, itemName, (int)buyMenuCash, buyMenuCash, itemCost );
 
 	buyMenuCash -= (float)itemCost;
-
+	inventory.money = buyMenuCash;
 	common->DPrintf( "Player %s just bought item %s; player now has %d (%g) credits, cost was %d\n", playerName, itemName, (int)buyMenuCash, buyMenuCash, itemCost );
 
 
@@ -8415,7 +8508,8 @@ bool idPlayer::AttemptToBuyItem( const char* itemName )
 	}
 
 	GiveStuffToPlayer( this, itemName, NULL );
-	gameLocal.mpGame.RedrawLocalBuyMenu();
+	hud->Redraw(gameLocal.time);
+	//gameLocal.mpGame.RedrawLocalBuyMenu();
 	return true;
 }
 
@@ -8424,7 +8518,7 @@ bool idPlayer::CanBuy( void ) {
 	if ( !ret ) {
 		return false;
 	}
-	return !spectating;
+	return ret;// !spectating;
 }
 
 
@@ -8685,14 +8779,34 @@ void idPlayer::HandleObjectiveInput() {
 		}
 	}
 #else
-	if ( ( usercmd.buttons & BUTTON_SCORES ) != 0 && !objectiveSystemOpen && !gameLocal.inCinematic ) {
+	if ( ( usercmd.buttons & BUTTON_SCORES ) != 0 && !objectiveSystemOpen  ) {
+		gameLocal.Printf("stage1\n");
+		//hud->Redraw(gameLocal.time);
+		//objectiveSystemOpen = true;
+		//buyMenu->Activate(true, gameLocal.time);
 		ToggleObjectives ( );
+		//buyMenuCash += 0;
+		//inventory.money += 0;
+		objectiveSystemOpen = true;
+		buttonPressed = true;
 	} else if ( ( usercmd.buttons & BUTTON_SCORES ) == 0 && objectiveSystemOpen ) {
-		ToggleObjectives ( );
-	} else if ( objectiveSystemOpen && gameLocal.inCinematic ) {
-		ToggleObjectives ( );
+		gameLocal.Printf("stage2\n");
+		gameLocal.mpGame.RedrawLocalBuyMenu();
+		//hud = defaultHud;
+		//ClearFocus();
+		
+		objectiveSystemOpen = false;
+		buttonPressed = false;
+	} else if ((usercmd.buttons & BUTTON_SCORES) != 0 && objectiveSystemOpen  ) {
+		gameLocal.Printf("stage3\n");
+		/*gameLocal.GetLocalPlayer()->hud = gameLocal.GetLocalPlayer()->defaultHud;
+		gameLocal.GetLocalPlayer()->hud->Redraw(gameLocal.time);
+		gameLocal.GetLocalPlayer()->hud->Activate(true, gameLocal.time);
+		gameLocal.GetLocalPlayer()->ClearFocus();
+		objectiveSystemOpen = false;*/
 	}
 #endif
+	//hud = defaultHud;
 }
 
 /*
@@ -9498,6 +9612,9 @@ void idPlayer::Think( void ) {
 	// if we have an active gui, we will unrotate the view angles as
 	// we turn the mouse movements into gui events
 	idUserInterface *gui = ActiveGui();
+	if (hud->Name() == buyMenu->Name() || hud->Name() == mainMenu->Name()) {
+		RouteGuiMouse(hud);
+	}
 	if ( gui && gui != focusUI ) {
 		RouteGuiMouse( gui );
 	}
@@ -9666,10 +9783,15 @@ idPlayer::RouteGuiMouse
 void idPlayer::RouteGuiMouse( idUserInterface *gui ) {
  	sysEvent_t ev;
  	const char *command;
-
+	sysEvent_t ev1;
+	const char *command1;
 	if ( usercmd.mx != oldMouseX || usercmd.my != oldMouseY ) {
  		ev = sys->GenerateMouseMoveEvent( usercmd.mx - oldMouseX, usercmd.my - oldMouseY );
+		//ev1 = sys->GenerateMouseButtonEvent(1, true);
  		command = gui->HandleEvent( &ev, gameLocal.time );
+		//command1 = gui->HandleEvent(&ev1, gameLocal.time);
+		HandleGuiCommands(this, command);
+		//HandleGuiCommands(this, command1);
 		oldMouseX = usercmd.mx;
 		oldMouseY = usercmd.my;
 	}

@@ -655,7 +655,8 @@ public:
 	bool			IsBuyingAllowedRightNow( void );
 // RITUAL END
 	static const char*	teamNames[ TEAM_MAX ];
-
+	idUserInterface      *buyMenu;
+	idUserInterface		*mainGui;
 private:
 	static const char	*MPGuis[];
 	static const char	*ThrottleVars[];
@@ -697,10 +698,10 @@ private:
 // squirrel: added DeadZone multiplayer mode
 	//int				sqRoundNumber;			// round number in DeadZone; match expires when this equals "sq_numRoundsPerMatch" (cvar)
 // squirrel: Mode-agnostic buymenus
-	idUserInterface *buyMenu;				// buy menu
+				// buy menu
 // RITUAL END
 	idUserInterface *scoreBoard;			// scoreboard
-	idUserInterface *mainGui;				// ready / nick / votes etc.
+					// ready / nick / votes etc.
 	idListGUI		*mapList;
 	idUserInterface *msgmodeGui;			// message mode
 	int				currentMenu;			// 0 - none, 1 - mainGui, 2 - msgmodeGui
@@ -738,6 +739,7 @@ public:
 	idList<idPlayer*>		unrankedPlayers;
 
 	rvPair<int, int>		rankedTeams[ TEAM_MAX ];
+	void			SetupBuyMenuItems();
 
 private:
 
@@ -749,7 +751,7 @@ private:
 	int				switchThrottle[ 3 ];
 	int				voiceChatThrottle;
 
-	void			SetupBuyMenuItems();
+	
 
 	idList<int>		privateClientIds;
 	int				privatePlayers;

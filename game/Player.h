@@ -270,7 +270,7 @@ public:
 
 class idPlayer : public idActor {
 public:
-
+		
  	enum {
  		EVENT_IMPULSE = idEntity::EVENT_MAXEVENTS,
  		EVENT_EXIT_TELEPORTER,
@@ -341,7 +341,9 @@ public:
 
  	idUserInterface *		hud;				// Common hud
 	idUserInterface *		mphud;				// hud overlay containing MP elements
-	
+	idUserInterface *		buyMenu;
+	idUserInterface *		mainMenu;
+	idUserInterface *		defaultHud;
 	idUserInterface *		objectiveSystem;
 	idUserInterface *		cinematicHud;
 	bool					objectiveSystemOpen;
@@ -610,7 +612,7 @@ public:
 
 	virtual bool			HandleSingleGuiCommand( idEntity *entityGui, idLexer *src );
 	bool					GuiActive( void ) { return focusType == FOCUS_GUI; }
-
+	bool					buttonPressed;
 // RITUAL BEGIN
 // squirrel: Mode-agnostic buymenus
 	void					GenerateImpulseForBuyAttempt( const char* itemName );
@@ -786,7 +788,7 @@ public:
 	bool					CanFire( void ) const;
 
 	bool					AllowedVoiceDest( int from );
-
+	void					ClearFocus(void);
 // RITUAL BEGIN
 // squirrel: added DeadZone multiplayer
 	itemBuyStatus_t			ItemBuyStatus( const char* itemName );
@@ -1005,7 +1007,7 @@ private:
 	int						oldInventoryWeapons;
 
 	const idDeclEntityDef*	itemCosts;
-
+	idDict					costs;
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );
 
@@ -1060,7 +1062,7 @@ private:
 
 	void					LoadDeferredModel			( void );
 
-	void					ClearFocus					( void );
+	
 	void					UpdateFocusCharacter		( idEntity* newEnt );
 	void					SetFocus					( playerFocus_t type, int focusTime, idEntity* ent, idUserInterface* ui );
 

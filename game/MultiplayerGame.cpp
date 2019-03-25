@@ -3485,26 +3485,26 @@ void idMultiplayerGame::SetupBuyMenuItems()
 	idPlayer* player = gameLocal.GetLocalPlayer();
 	if ( !player ) 
 		return;
-
-	buyMenu->SetStateInt( "buyStatus_shotgun", player->ItemBuyStatus( "weapon_shotgun" ) );
-	buyMenu->SetStateInt( "buyStatus_hyperblaster", player->ItemBuyStatus( "weapon_hyperblaster" ) );
+	buyMenu = gameLocal.GetLocalPlayer()->buyMenu;
+	buyMenu->SetStateInt("buyStatus_shotgun",  player->ItemBuyStatus("weapon_shotgun") );
+	buyMenu->SetStateInt( "buyStatus_hyperblaster",  player->ItemBuyStatus( "weapon_hyperblaster" ) );
 	buyMenu->SetStateInt( "buyStatus_grenadelauncher", player->ItemBuyStatus( "weapon_grenadelauncher" ) );
-	buyMenu->SetStateInt( "buyStatus_nailgun", player->ItemBuyStatus( "weapon_nailgun" ) );
-	buyMenu->SetStateInt( "buyStatus_rocketlauncher", player->ItemBuyStatus( "weapon_rocketlauncher" ) );
-	buyMenu->SetStateInt( "buyStatus_railgun", player->ItemBuyStatus( "weapon_railgun" ) );
+	buyMenu->SetStateInt( "buyStatus_nailgun",  player->ItemBuyStatus( "weapon_nailgun" ) );
+	buyMenu->SetStateInt( "buyStatus_rocketlauncher",  player->ItemBuyStatus( "weapon_rocketlauncher" ) );
+	buyMenu->SetStateInt( "buyStatus_railgun",  player->ItemBuyStatus( "weapon_railgun" ) );
 	buyMenu->SetStateInt( "buyStatus_lightninggun", player->ItemBuyStatus( "weapon_lightninggun" ) );
 	//	buyMenu->SetStateInt( "buyStatus_dmg", player->ItemBuyStatus( "weapon_dmg" ) );
-	buyMenu->SetStateInt( "buyStatus_napalmgun", player->ItemBuyStatus( "weapon_napalmgun" ) );
+	buyMenu->SetStateInt( "buyStatus_napalmgun",  player->ItemBuyStatus( "weapon_napalmgun" ) );
 
-	buyMenu->SetStateInt( "buyStatus_lightarmor", player->ItemBuyStatus( "item_armor_small" ) );
+	buyMenu->SetStateInt( "buyStatus_lightarmor",  player->ItemBuyStatus( "item_armor_small" ) );
 	buyMenu->SetStateInt( "buyStatus_heavyarmor", player->ItemBuyStatus( "item_armor_large" ) );
 	buyMenu->SetStateInt( "buyStatus_ammorefill", player->ItemBuyStatus( "ammorefill" ) );
 
 	buyMenu->SetStateInt( "buyStatus_special0", player->ItemBuyStatus( "ammo_regen" ) );
 	buyMenu->SetStateInt( "buyStatus_special1", player->ItemBuyStatus( "health_regen" ) );
-	buyMenu->SetStateInt( "buyStatus_special2", player->ItemBuyStatus( "damage_boost" ) );
+	buyMenu->SetStateInt( "buyStatus_special2",  player->ItemBuyStatus( "damage_boost" ) );
 
-	buyMenu->SetStateInt( "playerTeam", player->team );
+	buyMenu->SetStateInt( "playerTeam",  player->team );
 
 	if ( player->weapon )
 		buyMenu->SetStateString( "ammoIcon", player->weapon->spawnArgs.GetString ( "inv_icon" ) );
@@ -3748,6 +3748,7 @@ idMultiplayerGame::DisableMenu
 ================
 */
 void idMultiplayerGame::DisableMenu( void ) {
+	gameLocal.Printf("DisableMEnu");
 	if ( currentMenu == 1 ) {
 		mainGui->Activate( false, gameLocal.time );
 	} else if ( currentMenu == 2 ) {
@@ -3757,7 +3758,12 @@ void idMultiplayerGame::DisableMenu( void ) {
 // RITUAL BEGIN
 // squirrel: Mode-agnostic buymenus
 	} else if( currentMenu == 4 ) {
-		buyMenu->Activate( false, gameLocal.time );
+		gameLocal.Printf("close\n");
+		gameLocal.GetLocalPlayer()->hud = gameLocal.GetLocalPlayer()->defaultHud;
+		gameLocal.GetLocalPlayer()->hud->Redraw(gameLocal.time);
+		gameLocal.GetLocalPlayer()->hud->Activate(true, gameLocal.time);
+		gameLocal.GetLocalPlayer()->ClearFocus();
+		//buyMenu->Activate( false, gameLocal.time );
 // RITUAL END
 	}
 
@@ -3846,7 +3852,7 @@ const char* idMultiplayerGame::HandleGuiCommands( const char *_menuCommand ) {
 	idCmdArgs		args;
 
 
-
+	gameLocal.Printf("GUII");
 	if ( !_menuCommand[ 0 ] ) {
 		common->Printf( "idMultiplayerGame::HandleGuiCommands: empty command\n" );
 		return "continue";
@@ -9118,7 +9124,7 @@ idMultiplayerGame::IsBuyingAllowedInTheCurrentGameMode
 */
 bool idMultiplayerGame::IsBuyingAllowedInTheCurrentGameMode( void ) {
 	if ( !gameLocal.isMultiplayer ) {
-		return false;
+		return true;
 	}
 
 	if ( gameLocal.gameType != GAME_TOURNEY ) {
@@ -9136,7 +9142,7 @@ idMultiplayerGame::IsBuyingAllowedRightNow
 */
 bool idMultiplayerGame::IsBuyingAllowedRightNow( void )
 {
-	return ( IsBuyingAllowedInTheCurrentGameMode() && isBuyingAllowedRightNow );
+	return true;//(IsBuyingAllowedInTheCurrentGameMode() && isBuyingAllowedRightNow);
 }
 
 
