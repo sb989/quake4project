@@ -2368,7 +2368,7 @@ entityDef char_marine_base
 	"use_aas"									"aas32"
 	"articulatedFigure"							"marine3"
 	"ragdoll"									"marine3"
-	"health"									"125000"
+	"health"									"125"
 	"talks"										"0"
 	"npc_name"									"#str_107521"
 	"spawnclass"								"rvAITactical"
@@ -2514,7 +2514,7 @@ entityDef char_marine
 {
 	"inherit"						"char_marine_combat"
 	"editor_ignore"					"0"
-	"health"						"125000"
+	"health"						"75"
 	"hidesurface1"					"models/weapons/mp_guns/w_sg"
 	"hidesurface2"					"models/weapons/mp_guns/w_sg_mod_ammo"
 	"hidesurface3"					"models/weapons/mp_guns/w_hb"
@@ -2680,4 +2680,91 @@ entityDef char_marine_hyperblaster
 
 	// --------------------------------- Effects ---------------------------------
 	"fx_base_flash"								"effects/weapons/hyperblaster/muzzleflash_world.fx"
+}
+entityDef char_marine_lg
+{
+	"inherit"		"char_marine_combat"
+	"editor_ignore" "0"
+
+	"hidesurface1"								"models/weapons/mp_guns/w_mg_lo"
+	"hidesurface2"								"models/weapons/mp_guns/w_sg_mod_ammo"
+	"hidesurface3"								"models/weapons/mp_guns/w_hb"
+	"hidesurface4"								"models/weapons/mp_guns/w_hb_battery"
+
+	"joint_flashlight"							"SG_muzzle_flash"
+	"ammo"										"80"
+	"weaponPrefix"								"lightninggun"
+	"minShots"									"0"	
+	"maxShots"									"0"
+
+	"def_attack_base"							"projectile_marine_hyperblaster"
+	"attack_base_accuracy"						"1"
+
+	"def_attack_killswitch"						"projectile_marine_hyperblaster"
+	"attack_killswitch_accuracy"				"1"
+	"attack_killswitch_locktojoint"				"1"
+
+	"fireRate"									".08"
+
+	// --------------------------------- Sounds ---------------------------------
+	"snd_base_flash"							"npc_hyperblaster_fire"
+
+	// --------------------------------- Effects ---------------------------------
+	"fx_base_flash"								"effects/weapons/hyperblaster/muzzleflash_world.fx"
+}
+
+entityDef damage_marine_lg
+{
+	"inherit"											"damage_blaster"
+	"damage"											"14"
+
+	"deathPush"											"100"
+	"deathPushMin"										"3000 350"
+	"deathPushMax"										"5000 500"
+}
+
+entityDef projectile_marine_lg
+{
+	"inherit"											"projectile_blaster_base"
+
+	"def_damage"										"damage_marine_lg"
+
+	"speed"												"1800"
+	//"orient_towards_motion"								"1"
+
+	"foreshorten"				".6"
+
+	"mtr_flashShader"			"lights/muzzleflash"
+	"flashColor"				".5 .8 1"
+	"flashRadius"				"200"
+	"flashPointLight"			"1"
+	"flashTime"					".1"
+	"flashViewOffset"			"15 -5 -5"
+
+	"snd_quaddamage"			"weapon_quaddamage_fire"
+	"snd_acquire"				"pickup_weapon"
+	"snd_fire"					"weapon_lightninggun_fire"
+	"snd_fire_stereo"			"weapon_lightninggun_fire_stereo"
+	"snd_fire_loop"				"weapon_lightninggun_fireloop"
+	
+	"def_viewStyle"				"viewStyle_q3_lightninggun"
+
+	"weaponAngleOffsetAverages" "10"
+	"weaponAngleOffsetScale" 	".25"
+	"weaponAngleOffsetMax"		"5"
+	"weaponOffsetTime"			"600"
+	"weaponOffsetScale"			"0.002"
+
+	"fx_impact"					"effects/weapons/lightninggun/impact.fx"
+	"fx_impact_mp"					"effects/weapons/lightninggun/impact_mp.fx"
+//	"fx_impact_water"			"effects/ambient/splash_med.fx"
+	"fx_trail"					"effects/weapons/lightninggun/trail.fx"	
+	"fx_trail_world"			"effects/weapons/lightninggun/trail_world.fx"	
+	"fx_crawl"					"effects/weapons/lightninggun/crawl.fx"	
+	"fx_spire"					"effects/weapons/lightninggun/spire.fx"
+//	"fx_flash"					"effects/weapons/lightninggun/muzzleflash.fx"
+//	"fx_flash_world"			"effects/weapons/lightninggun/muzzleflash_world.fx"
+	"fx_respawn"				"effects/mp/itemrespawn.fx"
+	"crawlTime"					".05"
+								""
 }

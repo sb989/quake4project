@@ -17,11 +17,11 @@ windowDef Desktop
 	definevec4 	"typecolor" 		0.866,0.921,0.764,1
 	definevec4 	"typecolor_strogg" 	0.988,1,0.784,1
 	definevec4	"healthicon"		0.658,0.639,0.376,0.6
-	definevec4	"base_hp_icon"		0.658,0.639,0.376,0.6
 	definevec4	"armoricon"		0.658,0.639,0.376,0.6
 	definevec4	"healthicon_mp"		0.980,0.168,0.0196,0.8
 	definevec4	"armoricon_mp"		0.968,0.752,0.0156,0.8
 	definevec4 	"white" 		1,1,1,1
+	definevec4 "base_healthicon" 0.658,0.639,0.376,0.6
 		
 	float	"objdone"		0
 	float	"weapswitch"	0
@@ -45,7 +45,7 @@ windowDef Desktop
 		namedEvent "hideBrackets";
 		namedEvent "weaponChange";
 		namedEvent "radioChatterDown";
-		namedEvent "updateBaseHealth";
+		namedEvent "updateBaseHealth"
 	}
 	
 	onNamedEvent hideHud {
@@ -64,8 +64,8 @@ windowDef Desktop
 		set "p_armor::visible" "1" ;
 		set "p_health::visible" "1" ;
 		set "p_weapswitch::visible" "1" ;
-		set "powerups::visible" "1" ;
-		set "p_base_health::visible" "0"; 
+		set "powerups::visible" "1" ;	
+		set "p_base_Health::visible" "1" ;
 	}
 	
 	onNamedEvent removeDeathLine {
@@ -178,34 +178,33 @@ windowDef Desktop
 			resettime "health_amount" "0" ;
 		}
 	}
-	onNamedEvent updateBaseHealth{
+	onNamedEvent updateBaseHealth {
 		if ( "gui::mp" == 0 )
+		{
+			if ( "gui::base_healthpct" < 0.26 )
 			{
-				if ( "gui::base_healthpct" < 0.26 )
-				{
-					set "base_health_valbar::matcolor" "1,0.3,0,0.35" ;
-					set "base_health_val::matcolor" "1,0.3,0,0.5" ;
-					set "base_health_ekg::matcolor" "0.3,0.05,0,1" ;
-					set "base_health_backbar_add::visible" "1" ;
-				} else	{
-					set "base_health_valbar::matcolor" "0.698,0.811,0.427,0.2" ;
-					set "base_health_val::matcolor" "0.698,0.811,0.427,0.35" ;
-					set "base_health_ekg::matcolor" "0.0862,0.105,0.0549,1" ;
-					set "base_health_backbar_add::visible" "0" ;
-				}	
-			} else {
-				if ( "gui::base_healthpct" < 0.26 )
-				{
-					set "base_health_backbar_add_mp::visible" "1" ;
-				} else	{
-					set "base_health_backbar_add_mp::visible" "0" ;
-				}	
-			}
+				set "base_health_valbar::matcolor" "1,0.3,0,0.35" ;
+				set "base_health_val::matcolor" "1,0.3,0,0.5" ;
+				set "base_health_ekg::matcolor" "0.3,0.05,0,1" ;
+				set "base_health_backbar_add::visible" "1" ;
+			} else	{
+				set "base_health_valbar::matcolor" "0.698,0.811,0.427,0.2" ;
+				set "base_health_val::matcolor" "0.698,0.811,0.427,0.35" ;
+				set "base_health_ekg::matcolor" "0.0862,0.105,0.0549,1" ;
+				set "base_health_backbar_add::visible" "0" ;
+			}	
+		} else {
+			if ( "gui::player_healthpct" < 0.26 )
+			{
+				set "health_backbar_add_mp::visible" "1" ;
+			} else	{
+				set "health_backbar_add_mp::visible" "0" ;
+			}	
+		}
 	
-			if ( "gui::base_healthdelta" < 0 )
-			{
-				resettime "base_health_amount" "0" ;
-			}
+		if ( "gui::player_healthdelta" < 0 )
+		{
+			resettime "health_amount" "0" ;
 		}
 	}
 	onNamedEvent updateArmor {
@@ -467,6 +466,30 @@ windowDef Desktop
 		stoptransitions "missile_text";	
 		set "missile_text::forecolor" "1,.1,.1,.7" ;
 	}
+	
+	onNamedEvent showSpeed {
+		set	"speed::visible" "1" ;
+	}
+
+	onNamedEvent hideSpeed {
+		set "speed::visible" "0" ;
+	}
+
+//-----------------------		
+// MP speed meter
+//-----------------------
+
+	windowDef speed
+	{
+		rect	550,70,80,20
+		text	"gui::player_speed"
+		font	"fonts/lowpixel"
+		textalign	2
+		textscale	0.25
+		textstyle	1
+		forecolor	1,1,1,0.6
+	}		
+	
 		
 //-----------------------
 //  Comment controller - dev only
@@ -754,12 +777,12 @@ windowDef Desktop
 		}
 		windowDef d_health_amount
 		{
-			rect	254,427,58,31
+			rect	254,427,58,31  // +64,+7,-67,-28
 			visible	0
 		}		
 		windowDef health_amount
 		{
-			rect	256,429,52,26
+			rect	256,429,52,26	//+66,+9,-61,-23
 			visible	1
 			forecolor	0.866,0.921,0.764,1
 			text	"gui::player_health"
@@ -794,17 +817,18 @@ windowDef Desktop
 			shear	0,-.22
 		}
 	}
-
+	
 //-----------------------		
 // base health
-//-----------------------
-	windowDef p_base_health
+//-----------------------		
+	/*
+	windowDef base_p_health
 	{
 		rect	0,0,640,480
 		visible	("gui::mp" == 0 )
 		windowDef base_health_backbar
 		{
-			rect	300,340,10,0
+			rect	130,300,30,20
 			visible	1
 			background	"gfx/guis/hud/backbar"
 			matcolor	0,0,0,0.5
@@ -812,7 +836,7 @@ windowDef Desktop
 		}
 		windowDef base_health_valbar
 		{
-			rect	300,340,10,0
+			rect	130,300,30,20
 			visible	1
 			background	"gfx/guis/hud/valbar"
 			matcolor	0.701,0.815,0.431,0.2
@@ -820,20 +844,20 @@ windowDef Desktop
 		}
 		windowDef base_health_ekg
 		{
-			rect	300,340,10,0
+			rect	130,300,30,20
 			visible	1
 			background	"gfx/guis/hud/ekg"
 			matcolor	0.0862,0.105,0.0549,1
 			shear	0,-.22
 		}
-		windowDef p_base_health_val
+		windowDef base_p_health_val
 		{
-			rect	310 - ( "gui::base_healthpct" * 115 ),420,115,59
+			rect	310 - ( "gui::player_healthpct" * 115 ),300,20,20
 			visible	1
 			shear	0,-.22
-			windowDef base_health_val
+			windowDef health_val
 			{
-				rect	-120 + ( "gui::base_healthpct" * 115 ),0,125,59
+				rect	-120 + ( "gui::player_healthpct" * 115 ),0,30,20
 				visible	1
 				background	"gfx/guis/hud/valbar"
 				matcolor	0.701,0.815,0.431,0.35
@@ -842,15 +866,15 @@ windowDef Desktop
 		}
 		windowDef base_d_health_amount
 		{
-			rect	236,347,0,0
+			rect	194,307,0,0		// +64,+7,-67,-28
 			visible	0
 		}		
 		windowDef base_health_amount
 		{
-			rect	236,347,0,0
+			rect	196,309,0,0		//+66,+9,-61,-23
 			visible	1
 			forecolor	0.866,0.921,0.764,1
-			text	"gui::base_health"
+			text	"gui::player_health"
 			textscale	0.5
 			font	"fonts/chain"
 			shear	0,-.22
@@ -881,9 +905,7 @@ windowDef Desktop
 			matcolor	1*guitable_10_5[time*0.002],0,0,1
 			shear	0,-.22
 		}
-	}
-
-	
+	}		*/
 //-----------------------		
 // armor
 //-----------------------		

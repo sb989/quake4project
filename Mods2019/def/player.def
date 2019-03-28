@@ -683,6 +683,8 @@ entityDef player_marine
 	"weapon10_best"						"0"
 	"weapon10_cycle"					"1"	
 
+
+
 	"mtr_wound"						"textures/decals/hurt02"
 	"mtr_splat"						"textures/decals/dsplat2"
 	"mtr_splat2"						"textures/decals/dsplat5"
@@ -721,12 +723,12 @@ entityDef player_marine
 	"respawn_delay"						"1.7"		// minimum delay for respawning after death
 
 	// stats
-	"health"						"0"
+	"health"						"100"
 	"maxhealth"						"100"
 	"armor"							"0"
 	"maxarmor"						"100"
-	"minRestoreHealth0"					"100"		// Minimum health when loading a game for skill level 0
-	"minRestoreHealth1"					"100"		// Minimum health when loading a game for skill level 1
+	"minRestoreHealth0"					"20"		// Minimum health when loading a game for skill level 0
+	"minRestoreHealth1"					"10"		// Minimum health when loading a game for skill level 1
 
 	// ammo
 	"ammo_railgun"						"0"

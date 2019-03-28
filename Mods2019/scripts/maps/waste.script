@@ -9,7 +9,7 @@
 
 
 
-namespace map_waste
+namespace map_waste0
 
 //-------------------------------------------------------------------------------
 // Prep any level related things
@@ -25,20 +25,26 @@ void spawn_wave1(){
 	sys.trigger($waves_1);
 	
 }
+void first_wait(){
+	sys.wait(30);
+	sys.trigger($waves_2);
+	sys.trigger($waves_1);
+}
 
-void base_health(){
-	float health = $base.getHealth();
-	sys.wait(50);
-	while(health>0)
-	{
-		sys.print(health);
-		health = $base.getHealth();
-	}	
+void second_wait(){
+	sys.wait(30);
+	sys.trigger($waves_3);
+	sys.trigger($waves_4);
+}
+
+void end_game(){
 
 }
+
 void main()
-{	//thread base_health();
+{	
 	$base.becomePassive(1);
+	//sys.print($base.health)
 	spawn_wave1();
 	
 	//sys.trigger($waves_1);
@@ -46,4 +52,4 @@ void main()
 
 
 
-} // end namespace map_waste
+} // end namespace map_waste0
