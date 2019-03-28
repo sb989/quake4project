@@ -968,7 +968,7 @@ private:
 	// end mp
 
 	int						lastImpulseTime;		// time of last impulse
-	idEntityPtr<idEntity>	bossEnemy;
+	//idEntityPtr<idEntity>	bossEnemy;
 
 	const idDeclEntityDef*	cachedWeaponDefs[ MAX_WEAPONS ];
 	const idDeclEntityDef*	cachedPowerupDefs[ POWERUP_MAX ];

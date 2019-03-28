@@ -517,6 +517,15 @@
       <Filter>Game\MP\Stats</Filter>
     </ClCompile>
     <ClCompile Include="WaveSpawn.cpp" />
+    <ClCompile Include="LightningFence.cpp">
+      <Filter>Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponIceGun.cpp">
+      <Filter>Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Source.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h">

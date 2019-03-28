@@ -235,7 +235,7 @@ public:
 	bool					AnimDone				( int channel, int blendFrames );
 	
 	// animation state control
-	void					UpdateAnimState			( void );
+	void					UpdateAnimState			( int start = 0);
 	void					SetAnimState			( int channel, const char *name, int blendFrames = 0, int flags = 0 );
 	void					PostAnimState			( int channel, const char *name, int blendFrames = 0, int delay = 0, int flags = 0 );
 	void					StopAnimState			( int channel );

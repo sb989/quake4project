@@ -46,6 +46,7 @@ class idWorldspawn;
 class idTestModel;
 class idAAS;
 class idAI;
+
 // RAVEN BEGIN
 // bdube: not using id effects
 //class idSmokeParticles;
@@ -62,7 +63,7 @@ class idProgram;
 class idThread;
 class idEditEntities;
 class idLocationEntity;
-
+//class rvWeaponLightningGun;
 // RAVEN BEGIN
 // dluetscher: reduced max clients for memory usage
 #ifdef _XENON
@@ -123,7 +124,6 @@ void gameError( const char *fmt, ... );
 #include "Pvs.h"
 
 #include "FreeView.h"
-
 //============================================================================
 
 const int MAX_GAME_MESSAGE_SIZE		= 8192;
@@ -321,6 +321,9 @@ class rvGravityArea;
 
 class idGameLocal : public idGame {
 public:
+	//class gamestuff;
+
+	
 	idDict					serverInfo;				// all the tunable parameters, like numclients, etc
 	int						numClients;				// pulled from serverInfo and verified
 	idDict					userInfo[MAX_CLIENTS];	// client specific settings
@@ -339,7 +342,7 @@ public:
 	bool					sortPushers;			// true if active lists needs to be reordered to place pushers at the front
 	bool					sortTeamMasters;		// true if active lists needs to be reordered to place physics team masters before their slaves
 	idDict					persistentLevelInfo;	// contains args that are kept around between levels
-
+	int air = 1;
 // RAVEN BEGIN
 // bdube: client entities
 	rvClientEntity *			clientEntities[MAX_CENTITIES];	// index to client entities
@@ -1237,7 +1240,6 @@ const int	CINEMATIC_SKIP_DELAY	= SEC2MS( 2.0f );
 #include "client/ClientModel.h"
 #include "client/ClientAFEntity.h"
 
-#include "Weapon.h"
 
 #include "script/ScriptFuncUtility.h"
 

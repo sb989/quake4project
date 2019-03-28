@@ -13,6 +13,8 @@
 	
 ===============================================================================
 */
+#include "Weapon.h"
+//#include "weapon/WeaponLightningGun.cpp"
 
 extern const idEventDef EV_Player_GetButtons;
 extern const idEventDef EV_Player_GetMove;
@@ -270,7 +272,10 @@ public:
 
 class idPlayer : public idActor {
 public:
-		
+	
+	const int maxBossHealth = gameLocal.FindEntity("base")->health;
+	int getMaxBossHealth();
+
  	enum {
  		EVENT_IMPULSE = idEntity::EVENT_MAXEVENTS,
  		EVENT_EXIT_TELEPORTER,
@@ -798,7 +803,8 @@ public:
 	void					SetCash( float newCashAmount );
 	void					ResetCash();
 // RITUAL END
-
+	idEntityPtr<idEntity>	bossEnemy;
+	
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 
@@ -997,8 +1003,7 @@ private:
 	// end mp
 
 	int						lastImpulseTime;		// time of last impulse
-	idEntityPtr<idEntity>	bossEnemy;
-
+	
 	const idDeclEntityDef*	cachedWeaponDefs[ MAX_WEAPONS ];
 	const idDeclEntityDef*	cachedPowerupDefs[ POWERUP_MAX ];
 

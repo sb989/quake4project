@@ -13,14 +13,18 @@
 #include "Game_Log.h"
 #include "../idlib/containers/List.h"
 #include "spawner.h"
-
-
+//#include "weapon/weaponlightninggun.cpp"
+//#include "Weapon.h"
+//#include "GameStuff.h"
+//#include "Weapon.h"
+extern bool work;
 // RAVEN END
 
 //#define UI_DEBUG	1
 
 #ifdef GAME_DLL
-
+//static idList <rvWeaponLightningGun *> fence;
+// idList <rvWeaponLightningGun *> gamestuff::fence1 = fence3;
 idSys *						sys = NULL;
 idCommon *					common = NULL;
 idCmdSystem *				cmdSystem = NULL;
@@ -66,7 +70,7 @@ idAnimManager				*animationLib = NULL;
 // the rest of the engine will only reference the "game" variable, while all local aspects stay hidden
 idGameLocal					gameLocal;
 idGame *					game = &gameLocal;	// statically pointed at an idGameLocal
-
+//gamestuff					gamest;
 const char *idGameLocal::sufaceTypeNames[ MAX_SURFACE_TYPES ] = {
 	"none",	"metal", "stone", "flesh", "wood", "cardboard", "liquid", "glass", "plastic",
 	"ricochet", "surftype10", "surftype11", "surftype12", "surftype13", "surftype14", "surftype15"
@@ -1906,7 +1910,7 @@ idGameLocal::InitFromNewMap
 ===================
 */
 void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorld, bool isServer, bool isClient, int randseed ) {
-
+	//mapName = "maps/game/waste.map";
 	TIME_THIS_SCOPE( __FUNCLINE__);
 	
 	this->isServer = isServer;
@@ -1962,8 +1966,8 @@ void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 // ddynerman: set gametype
 	SetGameType();
 // RAVEN END
-
-	LoadMap( mapName, randseed );
+	gameLocal.Printf("gooflegorg%s\n", mapName);
+	LoadMap(mapName, 2 );
 
 	InitScriptForMap();
 
@@ -1997,6 +2001,7 @@ idGameLocal::InitFromSaveGame
 =================
 */
 bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWorld, idFile *saveGameFile ) {
+	
 	TIME_THIS_SCOPE( __FUNCLINE__);
 	
 	int i;
@@ -2015,7 +2020,7 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 	gameRenderWorld = renderWorld;
 
 	idRestoreGame savegame( saveGameFile );
-
+	
 	savegame.ReadBuildNumber();
 
 	// Create the list of all objects in the game
@@ -2031,10 +2036,10 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 
 		return false;
 	}
-
+	
 	// load the map needed for this savegame
 	LoadMap( mapName, 0 );
-
+	
 	savegame.ReadInt( i );
 	g_skill.SetInteger( i );
 
@@ -2260,8 +2265,18 @@ bool idGameLocal::InitFromSaveGame( const char *mapName, idRenderWorld *renderWo
 	gamestate = GAMESTATE_ACTIVE;
 
 	Printf( "--------------------------------------\n" );
+	
+	// RAVEN BEGIN
+	// mwhitlock: Dynamic memory consolidation
+#if defined(_RV_MEM_SYS_SUPPORT)
+animationLib->EndLevelLoad();
+#endif
+// RAVEN END
+
+	
 
 	return true;
+	
 }
 
 /*
@@ -3190,7 +3205,45 @@ void idGameLocal::UpdateClientsPVS( void ) {
 		clientsPVS[ i ] = GetClientPVS( static_cast< idPlayer * >( entities[ i ] ), PVS_NORMAL );
 	}
 }
+void crazyStuff() {
+	rvClientEffectPtr trailEffect;
+	rvClientEntityPtr<rvClientEffect>	trailEffectView;
+	//trailEffectView->IsClient();
+	rvWeapon w;
+	const idDeclEntityDef * weaponDef = w.weaponDef;
+	idPlayer * owner = gameLocal.GetLocalPlayer();
+	gameLocal.Printf("nosjta");
+	if (work) {
+		for (int i = 0;i < fence_o.NumAllocated();i++)
+		{
+			gameLocal.Printf("shoot");
+			idVec3 dir;
+			dir = fence_t[i].endpos - fence_o[i];
+			dir.Normalize();
 
+			// Trail effect
+
+			if (!trailEffect || true) {
+				trailEffect = gameLocal.PlayEffect(gameLocal.GetEffect(weaponDef->dict, "fx_trail_world"), fence_o[i], dir.ToMat3(), true, fence_t[i].endpos);
+			}
+			else {
+				trailEffect = gameLocal.PlayEffect(gameLocal.GetEffect(weaponDef->dict, "fx_trail_world"), fence_o[i], dir.ToMat3(), true, fence_t[i].endpos);
+			}
+
+			//dir = currentPath.origin - origin;
+			//dir.Normalize();
+
+			trailEffectView = gameLocal.PlayEffect(gameLocal.GetEffect(weaponDef->dict, "fx_trail"), fence_o[i], dir.ToMat3(), true, fence_t[i].endpos);
+			trailEffectView->GetRenderEffect()->allowSurfaceInViewID = gameLocal.GetLocalPlayer()->entityNumber + 1;;
+			float  power = 1.0f;
+			idEntity * ent = gameLocal.entities[fence_t[i].c.entityNum];
+			if (!ent || !ent->fl.takedamage) {
+				return;
+			}
+			ent->Damage(owner, owner, dir, "damage_lightninggun", power * owner->PowerUpModifier(PMOD_PROJECTILE_DAMAGE), 0);
+		}
+	}
+}
 /*
 ================
 idGameLocal::SetupPlayerPVS
@@ -3475,14 +3528,18 @@ idGameLocal::RunFrame
 	gameReturn_t ret;
 	idPlayer	*player;
 	const renderView_t *view;
-
+	trace_t	  tr;
 	editors = activeEditors;
 	isLastPredictFrame = lastCatchupFrame;
 
 	assert( !isClient );
-
+	//GetLocalPlayer().fence1;
+	//gamestuff *gs;
 	player = GetLocalPlayer();
-
+	
+	//rvWeaponLightningGun lg;
+	//lg.Pew();
+	
 	if ( !isMultiplayer && g_stopTime.GetBool() ) {
 
 		// set the user commands for this frame
@@ -3762,6 +3819,7 @@ TIME_THIS_SCOPE("idGameLocal::RunFrame - gameDebug.BeginFrame()");
 	D_DrawDebugLines();
 
 	g_simpleItems.ClearModified();
+	//crazyStuff();
 	return ret;
 }
 // RAVEN END
@@ -5256,7 +5314,7 @@ void idGameLocal::SpawnMapEntities( int instance, unsigned short* entityNumIn, u
 
 			idEntity* ent = NULL;
 			SpawnEntityDef( args, &ent );
-			common->Printf( "pop: spawn map ent %d at %d ( %s )\n", i, ent->entityNumber, args.GetString( "name" ) );
+			//common->Printf( "pop: spawn map ent %d at %d ( %s )\n", i, ent->entityNumber, args.GetString( "name" ) );
 	
 			if ( ent && entityNumOut ) {
 				entityNumOut[ i ] = ent->entityNumber;

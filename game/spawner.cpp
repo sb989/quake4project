@@ -19,32 +19,14 @@ Spawner.cpp
 const idEventDef EV_Spawner_RemoveNullActiveEntities( "removeNullActiveEntities" );
 const idEventDef EV_Spawner_NumActiveEntities( "numActiveEntities", "", 'd' );
 const idEventDef EV_Spawner_GetActiveEntity( "getActiveEntity", "d", 'e' );
-const idEventDef EV_Spawner_WaveShit("wave");
+//const idEventDef EV_Spawner_WaveShit("wave");
 CLASS_DECLARATION( idEntity, rvSpawner )
 	EVENT( EV_Activate,								rvSpawner::Event_Activate )
 	EVENT( EV_Spawner_RemoveNullActiveEntities,		rvSpawner::Event_RemoveNullActiveEntities )
 	EVENT( EV_Spawner_NumActiveEntities,			rvSpawner::Event_NumActiveEntities )
 	EVENT( EV_Spawner_GetActiveEntity,				rvSpawner::Event_GetActiveEntity )
-	EVENT( EV_Spawner_WaveShit,							rvSpawner::wave1)
+	//EVENT( EV_Spawner_WaveShit,							rvSpawner::wave1)
 END_CLASS
-
-
-void rvSpawner::wave1() {
-	const char *location;
-	const char *angle;
-	const char *key, *value;
-	idDict dict;
-	idEntity *newEnt;
-	location = "127,217,127";
-	value = "slimy_transfer";
-	angle = "127";
-	for (int i = 0;i < 4;i++) {
-		gameLocal.Printf("test");
-	}
-
-
-
-}
 
 /*
 ==============

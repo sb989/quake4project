@@ -2199,14 +2199,23 @@ void idActor::OnFriendlyFire ( idActor* attacker ) {
 idActor::UpdateAnimState
 =====================
 */
-void idActor::UpdateAnimState( void ) {
+void idActor::UpdateAnimState( int start ) {
 // RAVEN BEGIN
 // jnewquist: Tag scope and callees to track allocations using "new".
 	MEM_SCOPED_TAG(tag,MA_ANIM);
 // RAVEN END
-	headAnim.UpdateState();
-	torsoAnim.UpdateState();
-	legsAnim.UpdateState();
+	if (start > gameLocal.time) {
+		int n_start = gameLocal.time;
+		headAnim.UpdateState();
+		torsoAnim.UpdateState();
+		legsAnim.UpdateState();
+	}
+	else {
+		headAnim.UpdateState();
+		torsoAnim.UpdateState();
+		legsAnim.UpdateState();
+	}
+
 }
 
 /*

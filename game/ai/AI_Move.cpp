@@ -4800,7 +4800,9 @@ void idAI::Move	( void ) {
 	if ( ai_speeds.GetBool ( ) ) {
 		aiManager.timerMove.Start ( );
 	}
-
+	if (start > gameLocal.time) {
+		move.moveType = MOVETYPE_DEAD;
+	}
 	switch( move.moveType ) {
 	case MOVETYPE_DEAD:
 		DeadMove();

@@ -317,7 +317,20 @@ void rvWeaponNailgun::Think ( void ) {
 
 	// Let the real weapon think first
 	rvWeapon::Think ( );
+	if (wsfl.attack) {
+		gameLocal.TracePoint(owner, tr,
+			playerViewOrigin,
+			playerViewOrigin + playerViewAxis[0] * guideRange,
+			MASK_SHOT_BOUNDINGBOX, owner);
+		idDict d;
+		d.Set("classname", "char_marine");
+		d.Set("origin", tr.endpos.ToString());
+		//idEntity * ent;
+		gameLocal.SpawnEntityDef(d, &ent);
+		UseAmmo(1);
+	}
 
+	/*
 	// If no guide range is set then we dont have the mod yet
 	if ( !guideRange ) {
 		return;
@@ -402,7 +415,7 @@ void rvWeaponNailgun::Think ( void ) {
 		}
 	}
 	
-	UpdateGuideStatus ( (ent->GetPhysics()->GetOrigin() - playerViewOrigin).LengthFast() );
+	UpdateGuideStatus ( (ent->GetPhysics()->GetOrigin() - playerViewOrigin).LengthFast() );*/
 }
 
 /*

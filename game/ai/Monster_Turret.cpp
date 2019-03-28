@@ -3,7 +3,7 @@
 #pragma hdrstop
 
 #include "../Game_local.h"
-
+#include "AI_Manager.h"
 class rvMonsterTurret : public idAI {
 public:
 
@@ -61,11 +61,15 @@ rvMonsterTurret::Spawn
 ================
 */
 void rvMonsterTurret::Spawn ( void ) {
-	actionBlasterAttack.Init ( spawnArgs,	"action_blasterAttack",	"Torso_BlasterAttack",	AIACTIONF_ATTACK );
-
+	idAI ai;
+//	ai.JoinTeam
+	//this->JoinTeam(gameLocal.GetLocalPlayer());
+	this->team = gameLocal.GetLocalPlayer()->team;
+	//aiManager.AddTeammate(gameLocal.GetLocalPlayer());
+	actionBlasterAttack.Init(spawnArgs, "action_blasterAttack", "Torso_BlasterAttack", AIACTIONF_ATTACK);
 	shieldHealth = spawnArgs.GetInt ( "shieldHealth" );
 	health += shieldHealth;
-
+	//gameLocal.Printf("%b\n", aiManager.GetAllyTeam(this->team));
 	InitSpawnArgsVariables();
 	shots		= 0;
 }
@@ -116,6 +120,7 @@ bool rvMonsterTurret::Pain ( idEntity *inflictor, idEntity *attacker, int damage
 	// Handle the shield effects
 	if ( shieldHealth > 0 ) {
 		shieldHealth -= damage;
+		//gameLocal.GetLocalPlayer()->health+= damage;
 		if ( shieldHealth <= 0 ) {
 			PlayEffect ( "fx_shieldBreak", GetPhysics()->GetOrigin(), (-GetPhysics()->GetGravityNormal()).ToMat3() );
 		} else {
@@ -123,7 +128,7 @@ bool rvMonsterTurret::Pain ( idEntity *inflictor, idEntity *attacker, int damage
 		}
 	}
 
-	return idAI::Pain ( inflictor, attacker, damage, dir, location );
+	return true;//idAI::Pain ( inflictor, attacker, damage, dir, location );
 }
 
 /*
@@ -147,6 +152,7 @@ rvMonsterTurret::State_Combat
 ================
 */
 stateResult_t rvMonsterTurret::State_Combat ( const stateParms_t& parms ) {
+
 	// Aquire a new enemy if we dont have one
 	if ( !enemy.ent ) {
 		CheckForEnemy ( true );

@@ -18,7 +18,7 @@ public:
 	void					Restore				( idRestoreGame *savefile );
 	void					PreSave				( void );
 	void					PostSave			( void );
-
+	void					Think				( void );
 protected:
 	int						hitscans;
 
@@ -52,7 +52,30 @@ void rvWeaponShotgun::Spawn( void ) {
 	
 	SetState( "Raise", 0 );	
 }
+void rvWeaponShotgun::Think(void) {
+	idEntity* ent;
+	trace_t	  tr;
 
+	// Let the real weapon think first
+	rvWeapon::Think();
+	float range;
+	spawnArgs.GetFloat("range", "0", range);
+	if (wsfl.attack) {
+		gameLocal.TracePoint(owner, tr,
+			playerViewOrigin,
+			playerViewOrigin + playerViewAxis[0] * range,
+			MASK_SHOT_BOUNDINGBOX, owner);
+		idDict d;
+		d.Set("classname", "monster_turret_small");
+		d.Set("origin", tr.endpos.ToString());
+		//idEntity * ent;
+		gameLocal.SpawnEntityDef(d, &ent);
+		idAI ai;
+		//ent->JoinTeam(gameLocal.GetLocalPlayer());
+		UseAmmo(1);
+	}
+
+}
 /*
 ================
 rvWeaponShotgun::Save

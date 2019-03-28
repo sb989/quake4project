@@ -607,7 +607,7 @@ void idAI::Spawn( void ) {
 	idAngles			jointScale;
 	jointHandle_t		joint;
 	idVec3				local_dir;
-
+	start = 0;
 	// Are all monsters disabled?
 	if ( !g_monsters.GetBool() ) {
 		PostEventMS( &EV_Remove, 0 );
@@ -885,6 +885,17 @@ void idAI::Spawn( void ) {
 	PostEventMS( &EV_PostSpawn, 0 );
 	// RAVEN END
 }
+
+
+void idAI::slow() {
+	start = gameLocal.time + 5000;
+	move.fl.noRun = true;
+	move.fl.noWalk = false;
+	move.fl.onGround;
+	gameLocal.Printf("slow");
+
+}
+
 
 /*
 ===================
@@ -1298,6 +1309,10 @@ void idAI::Think( void ) {
 	if ( ai_speeds.GetBool ( ) ) {
 		aiManager.timerThink.Stop ( );
 	}
+	if (start < gameLocal.time) {
+		move.fl.noRun = false;
+		move.fl.noWalk = true;
+	}
 }
 
 /*
@@ -1435,7 +1450,7 @@ void idAI::UpdateStates ( void ) {
 
 	if ( move.fl.allowHiddenMove || !IsHidden() ) {
 		// update the animstate if we're not hidden
-		UpdateAnimState();
+		UpdateAnimState(start);
 	}
 }
 
@@ -1846,7 +1861,7 @@ void idAI::Activate( idEntity *activator ) {
 		player = static_cast<idPlayer *>( activator );
 	}
 
-	if ( ReactionTo( player ) & ATTACK_ON_ACTIVATE ) {
+	if ( ReactionTo( player ) & ATTACK_ON_ACTIVATE && this->GetClassname() != "rvMonsterTurret"){
 		SetEnemy( player );
 	}
 	

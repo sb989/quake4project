@@ -1203,10 +1203,14 @@ private:
 //============================================================================
 
 extern idGameLocal			gameLocal;
+
 // RAVEN BEGIN
 // jsinger: animationLib changed to a pointer to prevent it from allocating memory
 //          before the unified allocator is initialized
 extern idAnimManager		*animationLib;
+extern idList <idVec3> fence_o;
+extern idList <trace_t> fence_t;
+
 // RAVEN END
 
 //============================================================================

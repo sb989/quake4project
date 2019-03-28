@@ -13,7 +13,8 @@
 	
 ===============================================================================
 */
-
+extern idList<idVec3>fence_o;
+extern idList<trace_t>fence_t;
 typedef enum {
 	WP_READY,
 	WP_OUTOFAMMO,
@@ -86,7 +87,7 @@ public:
 
 	virtual void			GetPosition					( idVec3& origin, idMat3& axis ) const;
 
-private:
+
 
 	idStrList				pendingGUIEvents;
 
@@ -139,7 +140,7 @@ public:
 	virtual bool		ClientReceiveEvent			( int event, int time, const idBitMsg &msg );
 	virtual void		ClientStale					( void );
 	virtual void		ClientUnstale				( void ) { }
-	virtual void		Attack						( bool altFire, int num_attacks, float spread, float fuseOffset, float power );
+	virtual void		Attack						( bool altFire, int num_attacks, float spread, float fuseOffset, float power, bool slow = false );
 	virtual void		GetDebugInfo				( debugInfoProc_t proc, void* userData );
 	virtual void		SpectatorCycle				( void ) { }
 	virtual bool		NoFireWhileSwitching		( void ) const { return false; }
@@ -210,7 +211,7 @@ public:
 
 	// Attack
 	bool				PerformAttack				( idVec3& muzzleOrigin, idMat3& muzzleAxis, float dmgPower );
-	void				LaunchProjectiles			( idDict& dict, const idVec3& muzzleOrigin, const idMat3& muzzleAxis, int num_projectiles, float spread, float fuseOffset, float power );
+	void				LaunchProjectiles			( idDict& dict, const idVec3& muzzleOrigin, const idMat3& muzzleAxis, int num_projectiles, float spread, float fuseOffset, float power,bool slow );
 	void				Hitscan						( const idDict& dict, const idVec3& muzzleOrigin, const idMat3& muzzleAxis, int num_hitscans, float spread, float power );
 	void				AlertMonsters				( void );
 
@@ -236,7 +237,7 @@ public:
 	void				EnterCinematic				( void );
 	void				ExitCinematic				( void );
 
-protected:
+
 
 	virtual void		OnLaunchProjectile			( idProjectile* proj );
 
@@ -400,7 +401,7 @@ public:
 
 	idDict							spawnArgs;
 
-protected:
+
 
 	idEntityPtr<rvViewWeapon>		viewModel;
 	idAnimator*						viewAnimator;
@@ -417,7 +418,7 @@ protected:
 	rvStateThread					stateThread;
 	int								animDoneTime[ANIM_NumAnimChannels];
 
-private:
+
 
 	stateResult_t			State_Raise				( const stateParms_t& parms );
 	stateResult_t			State_Lower				( const stateParms_t& parms );

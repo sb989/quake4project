@@ -2502,7 +2502,7 @@ void rvWeapon::AddToClip ( int amount ) {
 rvWeapon::Attack
 ================
 */
-void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuseOffset, float power ) {
+void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuseOffset, float power, bool slow) {
 	idVec3 muzzleOrigin;
 	idMat3 muzzleAxis;
 	num_attacks = num_attacks * 10;
@@ -2526,7 +2526,7 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 		owner->inventory.UseAmmo( ammoType, ammoRequired );
 		if ( clipSize && ammoRequired ) {
  			clipPredictTime = gameLocal.time;	// mp client: we predict this. mark time so we're not confused by snapshots
-			ammoClip += 1;
+			ammoClip -= 1;
 		}
 
 		// wake up nearby monsters
@@ -2596,7 +2596,7 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 		if ( altAttack ? wfl.attackAltHitscan : wfl.attackHitscan ) {
 			Hitscan( dict, muzzleOrigin, muzzleAxis, num_attacks, spread, power );
 		} else {
-			LaunchProjectiles( dict, muzzleOrigin, muzzleAxis, num_attacks, spread, fuseOffset, power );
+			LaunchProjectiles( dict, muzzleOrigin, muzzleAxis, num_attacks, spread, fuseOffset, power,slow );
 		}
 		//asalmon:  changed to keep stats even in single player 
 		statManager->WeaponFired( owner, weaponIndex, num_attacks );
@@ -2609,7 +2609,7 @@ void rvWeapon::Attack( bool altAttack, int num_attacks, float spread, float fuse
 rvWeapon::LaunchProjectiles
 ================
 */
-void rvWeapon::LaunchProjectiles ( idDict& dict, const idVec3& muzzleOrigin, const idMat3& muzzleAxis, int num_projectiles, float spread, float fuseOffset, float power ) {
+void rvWeapon::LaunchProjectiles ( idDict& dict, const idVec3& muzzleOrigin, const idMat3& muzzleAxis, int num_projectiles, float spread, float fuseOffset, float power, bool slow = false ) {
 	idProjectile*	proj;
 	idEntity*		ent;
 	int				i;
@@ -2712,7 +2712,7 @@ void rvWeapon::LaunchProjectiles ( idDict& dict, const idVec3& muzzleOrigin, con
 		}
 		
 		// Launch the actual projectile
-		proj->Launch( muzzle_pos + startOffset, dir, pushVelocity, fuseOffset, power );
+		proj->Launch( muzzle_pos + startOffset, dir, pushVelocity, fuseOffset, power, slow );
 		
 		// Increment the projectile launch count and let the derived classes
 		// mess with it if they want.

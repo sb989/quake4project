@@ -4166,10 +4166,14 @@ bool idEntity::HandleGuiCommands( idEntity *entityGui, const char *cmds ) {
 
 				if (entityGui == gameLocal.GetLocalPlayer()) {
 					gameLocal.Printf("close\n");
-					gameLocal.GetLocalPlayer()->hud = gameLocal.GetLocalPlayer()->defaultHud;
-					gameLocal.GetLocalPlayer()->hud->Redraw(gameLocal.time);
-					gameLocal.GetLocalPlayer()->hud->Activate(true,gameLocal.time);
-					gameLocal.GetLocalPlayer()->ClearFocus();
+					idPlayer * player = gameLocal.GetLocalPlayer();
+					player->hud = gameLocal.GetLocalPlayer()->defaultHud;
+					player->hud->Redraw(gameLocal.time);
+					player->hud->Activate(true,gameLocal.time);
+					player->ClearFocus();
+					player->bossEnemy = gameLocal.FindEntity("base");
+					player->hud->SetStateInt("boss_maxhealth", player->getMaxBossHealth());
+					player->hud->HandleNamedEvent("showBossBar");
 				}
 				ret = true;
 				continue;

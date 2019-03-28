@@ -793,8 +793,8 @@ public:
 	// ai/ai_events.cpp
 	//
 public:
-
-
+	void slow();
+	int start;
 	virtual bool			CanTakeDamage					( void ) const;
 	virtual bool			CanTakePain						( void ) const;
 	virtual bool			CanTurn							( void ) const;

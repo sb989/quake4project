@@ -7,10 +7,19 @@
 #include "../Projectile.h"
 #include "../ai/AI_Manager.h"
 
+
+//#include "Game_local.cpp"
+
+;
 const int	LIGHTNINGGUN_NUM_TUBES	=	3;
 const int	LIGHTNINGGUN_MAX_PATHS  =	3;
 
 const idEventDef EV_Lightninggun_RestoreHum( "<lightninggunRestoreHum>", "" );
+static idList<idVec3> fence_o1;
+static idList<trace_t>fence_t1;
+extern idList<idVec3> fence_o = fence_o1;
+extern idList<trace_t> fence_t = fence_t1;
+extern bool work = false;
 
 class rvLightningPath {
 public:
@@ -30,15 +39,21 @@ class rvWeaponLightningGun : public rvWeapon {
 public:
 
 	CLASS_PROTOTYPE( rvWeaponLightningGun );
-
+	int cat = 0;
+	trace_t t;
+	idVec3 org;
+	
 	rvWeaponLightningGun( void );
+	rvWeaponLightningGun(trace_t tt, idVec3 origin) : t(tt), org(origin){};
 	~rvWeaponLightningGun( void );
-
+	float								range;
 	virtual void			Spawn		( void );
 	virtual void			Think		( void );
 
-	virtual void			ClientStale	( void );
+	void Pew();
 
+	virtual void			ClientStale	( void );
+	
 	void					PreSave		( void );
 	void					PostSave	( void );
 
@@ -46,8 +61,9 @@ public:
 	void					Restore		( idRestoreGame* savefile );
 
 	bool			NoFireWhileSwitching( void ) const { return true; }
-
-protected:
+	rvLightningPath						currentPath;
+	
+	
 
 	void					UpdateTubes	( void );
 
@@ -63,18 +79,18 @@ protected:
 
 	int									nextCrawlTime;
 
-	float								range;
+	
 	jointHandle_t						spireJointView;
 	jointHandle_t						chestJointView;
 	
 
-	rvLightningPath						currentPath;
+	
 	
 	// Chain lightning mod
 	idList<rvLightningPath>				chainLightning;
 	idVec3								chainLightningRange;
 
-private:
+
 
 	void				Attack					( idEntity* ent, const idVec3& dir, float power = 1.0f );
 
@@ -89,14 +105,16 @@ private:
 	stateResult_t		State_Fire				( const stateParms_t& parms );
 
 	void				Event_RestoreHum	( void );
-
+	
 	CLASS_STATES_PROTOTYPE ( rvWeaponLightningGun );
 };
 
-CLASS_DECLARATION( rvWeapon, rvWeaponLightningGun )
-EVENT( EV_Lightninggun_RestoreHum,			rvWeaponLightningGun::Event_RestoreHum )
+CLASS_DECLARATION(rvWeapon, rvWeaponLightningGun)
+EVENT(EV_Lightninggun_RestoreHum, rvWeaponLightningGun::Event_RestoreHum)
 END_CLASS
 
+//static rvWeaponLightningGun *[1000] fence = {};
+//static idList<rvWeaponLightningGun *> fence;
 /*
 ================
 rvWeaponLightningGun::rvWeaponLightningGun
@@ -104,7 +122,7 @@ rvWeaponLightningGun::rvWeaponLightningGun
 */
 rvWeaponLightningGun::rvWeaponLightningGun( void ) {
 }
-
+//rvWeaponLightningGun::rvWeaponLightningGun(trace_t tt) {}
 /*
 ================
 rvWeaponLightningGun::~rvWeaponLightningGun
@@ -134,6 +152,7 @@ rvWeaponLightningGun::Spawn
 void rvWeaponLightningGun::Spawn( void ) {
 	int i;
 	
+	
 	trailEffectView = NULL;
 	nextCrawlTime	= 0;
 
@@ -162,8 +181,10 @@ void rvWeaponLightningGun::Spawn( void ) {
 	}
 
 	chainLightningRange = spawnArgs.GetVec2( "chainLightningRange", "150 300" );
-	
+	//Think();
 	SetState ( "Raise", 0 );
+	//SetState("Fire", 1);
+	//
 }
 
 /*
@@ -259,75 +280,132 @@ void rvWeaponLightningGun::Think ( void ) {
 
 	rvWeapon::Think();
 
-	UpdateTubes();
 
-	// If no longer firing or out of ammo then nothing to do in the think
-	if ( !wsfl.attack || !IsReady() || !AmmoAvailable() ) {
-		if ( trailEffectView ) {
-			trailEffectView->Stop ( );
-			trailEffectView = NULL;
-		}
-	
-		currentPath.StopEffects();
-		StopChainLightning();
-		return;
-	}
+	if (owner != gameLocal.GetLocalPlayer()) {
+		UpdateTubes();
 
-	// Cast a ray out to the lock range
-// RAVEN BEGIN
-// ddynerman: multiple clip worlds
-// jshepard: allow projectile hits
-	gameLocal.TracePoint(	owner, tr, 
-							playerViewOrigin, 
-							playerViewOrigin + playerViewAxis[0] * range, 
-							(MASK_SHOT_RENDERMODEL|CONTENTS_WATER|CONTENTS_PROJECTILE), owner );
-// RAVEN END
-	// Calculate the direction of the lightning effect using the barrel joint of the weapon
-	// and the end point of the trace
-	idVec3 origin;
-	idMat3 axis;
-	
-	//fire from chest if show gun models is off.
-	if( !cvarSystem->GetCVarBool("ui_showGun"))	{
-		GetGlobalJointTransform( true, chestJointView, origin, axis );
-	} else {
-		GetGlobalJointTransform( true, barrelJointView, origin, axis );
-	}
+		// If no longer firing or out of ammo then nothing to do in the think
+		if (!wsfl.attack || !IsReady() || !AmmoAvailable()) {
+			if (trailEffectView) {
+				//trailEffectView->Stop ( );
+				//trailEffectView = NULL;
+			}
 
-	// Cache the target we are hitting
-	currentPath.origin = tr.endpos;
-	currentPath.normal = tr.c.normal;
-	currentPath.target = gameLocal.entities[tr.c.entityNum];
-
-	UpdateChainLightning();
-	
-	UpdateEffects( origin );
-	
-	MuzzleFlash();
-
-	// Inflict damage on all targets being attacked
-	if ( !gameLocal.isClient && gameLocal.time >= nextAttackTime ) {
-		int    i;
-		float  power = 1.0f;
-		idVec3 dir;
-		
-		owner->inventory.UseAmmo( ammoType, ammoRequired );
-		
-		dir = tr.endpos - origin;
-		dir.Normalize ( );
-		
-		nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-		Attack ( currentPath.target, dir, power );
-		for ( i = 0; i < chainLightning.Num(); i ++, power *= 0.75f ) {
-			Attack ( chainLightning[i].target, chainLightning[i].normal, power );
+			//currentPath.StopEffects();
+			//StopChainLightning();
+			//return;
 		}
 
-		statManager->WeaponFired( owner, owner->GetCurrentWeapon(), chainLightning.Num() + 1 );
+		// Cast a ray out to the lock range
+	// RAVEN BEGIN
+	// ddynerman: multiple clip worlds
+	// jshepard: allow projectile hits
+		gameLocal.TracePoint(owner, tr,
+			playerViewOrigin,
+			playerViewOrigin + playerViewAxis[0] * range,
+			(MASK_SHOT_RENDERMODEL | CONTENTS_WATER | CONTENTS_PROJECTILE), owner);
+		// RAVEN END
+			// Calculate the direction of the lightning effect using the barrel joint of the weapon
+			// and the end point of the trace
+		idVec3 origin;
+		idMat3 axis;
+
+		//fire from chest if show gun models is off.
+		if (!cvarSystem->GetCVarBool("ui_showGun")) {
+			GetGlobalJointTransform(true, chestJointView, origin, axis);
+		}
+		else {
+			GetGlobalJointTransform(true, barrelJointView, origin, axis);
+		}
+
+		// Cache the target we are hitting
+		currentPath.origin = tr.endpos;
+		currentPath.normal = tr.c.normal;
+		currentPath.target = gameLocal.entities[tr.c.entityNum];
+
+		UpdateChainLightning();
+
+		UpdateEffects(origin);
+
+		MuzzleFlash();
+
+		// Inflict damage on all targets being attacked
+		if (!gameLocal.isClient && gameLocal.time >= nextAttackTime) {
+			int    i;
+			float  power = 1.0f;
+			idVec3 dir;
+
+			//owner->inventory.UseAmmo( ammoType, ammoRequired );
+
+			dir = tr.endpos - origin;
+			dir.Normalize();
+
+			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier(PMOD_FIRERATE));
+			Attack(currentPath.target, dir, power);
+			for (i = 0; i < chainLightning.Num(); i++, power *= 0.75f) {
+				Attack(chainLightning[i].target, chainLightning[i].normal, power);
+			}
+
+			statManager->WeaponFired(owner, owner->GetCurrentWeapon(), chainLightning.Num() + 1);
+		}
+
+		// Play the lightning crawl effect every so often when doing damage
+		if (gameLocal.time > nextCrawlTime) {
+			nextCrawlTime = gameLocal.time + SEC2MS(spawnArgs.GetFloat("crawlDelay", ".3"));
+		}
+	}
+	else {
+		if (wsfl.attack) {
+			gameLocal.TracePoint(owner, tr,
+				playerViewOrigin,
+				playerViewOrigin + playerViewAxis[0] * range,
+				MASK_SHOT_BOUNDINGBOX, owner);
+			idDict d;
+			d.Set("classname", "weapon_lightninggun");
+			d.Set("origin", tr.endpos.ToString());
+			idEntity * ent;
+			gameLocal.SpawnEntityDef(d, &ent);
+			//if(ent->getentit)
+			UseAmmo(1);
+		}
+
+
 	}
 
-	// Play the lightning crawl effect every so often when doing damage
-	if ( gameLocal.time > nextCrawlTime ) {
-		nextCrawlTime = gameLocal.time + SEC2MS(spawnArgs.GetFloat ( "crawlDelay", ".3" ));
+}
+
+
+
+
+void rvWeaponLightningGun::Pew() {
+	idPlayer *player = gameLocal.GetLocalPlayer();
+	
+	if (fence_o.NumAllocated()!=0 && fence_t.NumAllocated() != 0) {
+		idPlayer	*owner = player;
+		for (int i = 0; i < (fence_o.NumAllocated()); i++) {
+			idVec3 origin;
+			origin = fence_o[i];
+			trace_t t = fence_t[i];
+			gameLocal.TracePoint(gameLocal.GetLocalPlayer(), t,
+				origin,
+				t.endpos,
+				(MASK_SHOT_RENDERMODEL | CONTENTS_WATER | CONTENTS_PROJECTILE), gameLocal.GetLocalPlayer());
+			
+			idMat3 axis;
+
+			
+			this->currentPath.origin = t.endpos;
+			//this->currentPath.normal = t.c.normal;
+			this->currentPath.target = gameLocal.entities[t.c.entityNum];
+			
+			idVec3 dir;
+			dir = t.endpos - origin;
+			dir.Normalize();
+			float  power = 1.0f;
+			this->Attack(gameLocal.entities[t.c.entityNum], dir, power);
+			
+		}
+
 	}
 }
 
@@ -344,7 +422,7 @@ void rvWeaponLightningGun::Attack ( idEntity* ent, const idVec3& dir, float powe
 
 	// Start a lightning crawl effect every so often
 	// we don't synchronize it, so let's not show it in multiplayer for a listen host. also fixes seeing it on the host from other instances
-	if ( !gameLocal.isMultiplayer && gameLocal.time > nextCrawlTime ) {
+	if ( false && !gameLocal.isMultiplayer && gameLocal.time > nextCrawlTime ) {
 		if ( ent->IsType( idActor::GetClassType() ) ) {
 			rvClientCrawlEffect* effect;
 			effect = new rvClientCrawlEffect( gameLocal.GetEffect( weaponDef->dict, "fx_crawl" ), ent, SEC2MS( spawnArgs.GetFloat ( "crawlTime", ".2" ) ) );
@@ -865,7 +943,7 @@ stateResult_t rvWeaponLightningGun::State_Fire( const stateParms_t& parms ) {
 				return SRESULT_DONE;
 			}
 			if ( !wsfl.lowerWeapon && wsfl.attack && AmmoAvailable ( ) ) {
-				SetState( "Fire", 4 );
+				SetState( "Fire", 1);
 				return SRESULT_DONE;
 			}
 			return SRESULT_WAIT;
@@ -921,12 +999,13 @@ void rvLightningPath::UpdateEffects ( const idVec3& from, const idDict& dict ) {
 	dir.Normalize();
 	
 	// Trail effect
-	if ( !trailEffect ) {
+	if ( !trailEffect|| true ) {
 		trailEffect = gameLocal.PlayEffect ( gameLocal.GetEffect ( dict, "fx_trail_world" ), from, dir.ToMat3(), true, origin );		
 	} else {
 		trailEffect->SetOrigin ( from );
 		trailEffect->SetAxis ( dir.ToMat3() );
 		trailEffect->SetEndOrigin ( origin );
+		trailEffect = gameLocal.PlayEffect(gameLocal.GetEffect(dict, "fx_trail_world"), from, dir.ToMat3(), true, origin);
 	}
 	
 	// Impact effect

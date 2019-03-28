@@ -424,7 +424,9 @@ void GiveStuffToPlayer( idPlayer* player, const char* name, const char* value )
 	} else {
 		give_all = false;
 	}
-
+	if (idStr::Icmp(name, "turret") == 0) {
+		player->GiveItem(name);
+	}
 	if ( give_all || ( idStr::Cmpn( name, "weapon", 6 ) == 0 ) ) {
 		if ( gameLocal.world->spawnArgs.GetBool( "no_Weapons" ) ) {
 			gameLocal.world->spawnArgs.SetBool( "no_Weapons", false );

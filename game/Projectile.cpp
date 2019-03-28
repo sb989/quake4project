@@ -27,6 +27,8 @@ const idEventDef EV_Fizzle( "<fizzle>", NULL );
 const idEventDef EV_RadiusDamage( "<radiusdmg>", "E" );
 const idEventDef EV_ResidualDamage ( "<residualdmg>", "E" );
 
+bool slow1 = false;
+
 CLASS_DECLARATION( idEntity, idProjectile )
 	EVENT( EV_Explode,			idProjectile::Event_Explode )
 	EVENT( EV_Fizzle,			idProjectile::Event_Fizzle )
@@ -319,7 +321,7 @@ void idProjectile::FreeLightDef( void ) {
 idProjectile::Launch
 =================
 */
-void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 &pushVelocity, const float timeSinceFire, const float dmgPower ) {
+void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 &pushVelocity, const float timeSinceFire, const float dmgPower, bool slow) {
 	float			fuse;
 	idVec3			velocity;
 	float			linear_friction;
@@ -333,7 +335,7 @@ void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 
 	idVec3			tmp;
 	int				contents;
  	int				clipMask;
-
+	slow1 = slow;
  	// allow characters to throw projectiles during cinematics, but not the player
  	if ( owner.GetEntity() && !owner.GetEntity()->IsType( idPlayer::GetClassType() ) ) {
  		cinematic = owner.GetEntity()->cinematic;
@@ -621,7 +623,7 @@ void idProjectile::UpdateVisualAngles() {
 idProjectile::Collide
 =================
 */
-bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity ) {
+bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity) {
 	bool dummy = false;
 	return Collide( collision, velocity, dummy );
 }
@@ -633,7 +635,7 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
  	const char*	damageDefName;
  	idVec3		dir;
  	bool		canDamage;
- 	
+
  	hitTeleporter = false;
 
 	if ( state == EXPLODED || state == FIZZLED ) {
@@ -892,7 +894,22 @@ bool idProjectile::Collide( const trace_t &collision, const idVec3 &velocity, bo
 			}	
 // RAVEN END
  			ent->Damage( this, owner, dir, damageDefName, damagePower, hitJoint );
-			
+			if (slow1) {
+				//idVec3 vel = ent->GetPhysics()->GetLinearVelocity();
+				idVec3 point = ent->GetPhysics()->GetOrigin();
+				int id = 0;
+				ent->GetPhysics()->AddForce(1, point, 100 * dir);
+				//ent->GetPhysics()->
+				//ent->ActivatePhysics(this);
+				ApplyImpulse(ent,id, point,300*dir,false);
+				if (ent->IsType(idAI::GetClassType()))
+				{
+					//idAI* enemyAI = static_cast<idAI*>(ent);
+					//enemyAI->slow();
+					//enemyAI->move.fl.noRun = true;
+					//ent->GetPhysics()->SetLinearVelocity(vel / 2);
+				}
+			}
 			if( owner && owner->IsType( idPlayer::GetClassType() ) && ent->IsType( idActor::GetClassType() ) ) {
 				statManager->WeaponHit( (const idActor*)(owner.GetEntity()), ent, methodOfDeath, hitCount == 0 );			
 				hitCount++;

@@ -18,6 +18,7 @@
 #include "Healing_Station.h"
 #include "ai/AI_Medic.h"
 
+
 // RAVEN BEGIN
 // nrausch: support for turning the weapon change ui on and off
 #ifdef _XENON
@@ -1085,8 +1086,9 @@ idPlayer::idPlayer
 ==============
 */
 idPlayer::idPlayer() {
-	memset( &usercmd, 0, sizeof( usercmd ) );
 
+	memset( &usercmd, 0, sizeof( usercmd ) );
+	//maxBossHealth = 0;
 	alreadyDidTeamAnnouncerSound = false;
 
 	doInitWeapon			= false;
@@ -1351,56 +1353,7 @@ idPlayer::idPlayer() {
 	teamDoubler			= NULL;		
 	teamDoublerPending		= false;
 
-	buyMenu = gameLocal.mpGame.buyMenu;	//uiManager->FindGui("guis/buymenu.gui", true, false, true); //
-	buyMenu->SetStateString("field_credits", "0");
-	buyMenu->SetStateBool("gameDraw", true);
-	costs.SetInt("weapon_shotgun", 100);
-	buyMenu->SetStateInt("price_shotgun", GetItemCost("weapon_shotgun"));
-	buyMenu->SetStateInt("price_hyperblaster",  GetItemCost("weapon_hyperblaster"));
-	buyMenu->SetStateInt("price_grenadelauncher", GetItemCost("weapon_grenadelauncher"));
-	buyMenu->SetStateInt("price_nailgun", GetItemCost("weapon_nailgun"));
-	buyMenu->SetStateInt("price_rocketlauncher",  GetItemCost("weapon_rocketlauncher"));
-	buyMenu->SetStateInt("price_railgun",  GetItemCost("weapon_railgun"));
-	buyMenu->SetStateInt("price_lightninggun",GetItemCost("weapon_lightninggun"));
-	//			buyMenu->SetStateInt( "price_dmg", GetItemCost( "weapon_dmg" ) );
-	buyMenu->SetStateInt("price_napalmgun", GetItemCost("weapon_napalmgun"));
-
-	buyMenu->SetStateInt("price_lightarmor", GetItemCost("item_armor_small"));
-	buyMenu->SetStateInt("price_heavyarmor", GetItemCost("item_armor_large"));
-	buyMenu->SetStateInt("price_ammorefill", GetItemCost("ammorefill"));
-
-	buyMenu->SetStateInt("price_special0",  GetItemCost("ammo_regen"));
-	buyMenu->SetStateInt("price_special1", GetItemCost("health_regen"));
-	buyMenu->SetStateInt("price_special2", GetItemCost("damage_boost"));
-	buyMenu->SetStateInt("buyStatus_shotgun", ItemBuyStatus("weapon_shotgun") );
-	buyMenu->SetStateInt("buyStatus_hyperblaster", ItemBuyStatus( "weapon_hyperblaster" ) );
-	buyMenu->SetStateInt("buyStatus_grenadelauncher", ItemBuyStatus( "weapon_grenadelauncher" ) );
-	buyMenu->SetStateInt("buyStatus_nailgun", ItemBuyStatus( "weapon_nailgun" ) );
-	buyMenu->SetStateInt("buyStatus_rocketlauncher", ItemBuyStatus( "weapon_rocketlauncher" ) );
-	buyMenu->SetStateInt("buyStatus_railgun",  ItemBuyStatus( "weapon_railgun" ) );
-	buyMenu->SetStateInt("buyStatus_lightninggun", ItemBuyStatus( "weapon_lightninggun" ) );
-	//	buyMenu->SetStateInt( "buyStatus_dmg", ItemBuyStatus( "weapon_dmg" ) );
-	buyMenu->SetStateInt("buyStatus_napalmgun", ItemBuyStatus( "weapon_napalmgun" ) );
-
-	buyMenu->SetStateInt("buyStatus_lightarmor",  ItemBuyStatus( "item_armor_small" ) );
-	buyMenu->SetStateInt("buyStatus_heavyarmor", ItemBuyStatus( "item_armor_large" ) );
-	buyMenu->SetStateInt("buyStatus_ammorefill", ItemBuyStatus( "ammorefill" ) );
-
-	buyMenu->SetStateInt("buyStatus_special0", ItemBuyStatus( "ammo_regen" ) );
-	buyMenu->SetStateInt("buyStatus_special1", ItemBuyStatus( "health_regen" ) );
-	buyMenu->SetStateInt("buyStatus_special2", ItemBuyStatus( "damage_boost" ) );
-
-	buyMenu->SetStateInt("playerTeam", team );
-
-	if (weapon)
-		buyMenu->SetStateString("ammoIcon", weapon->spawnArgs.GetString("inv_icon"));
-
-	buyMenu->SetStateInt("player_weapon", GetCurrentWeapon());
-	//gameLocal.mpGame.SetupBuyMenuItems();
-	UpdateHudStats(buyMenu);
-	buyMenuCash = 0;
-	buyMenu->Activate(true,gameLocal.time);
-	mainMenu = gameLocal.mpGame.mainGui;
+	
 }
 
 /*
@@ -1867,7 +1820,44 @@ Prepare any resources used by the player.
 void idPlayer::Spawn( void ) {
 	idStr		temp;
 	idBounds	bounds;
+	buyMenu = gameLocal.mpGame.buyMenu;	//uiManager->FindGui("guis/buymenu.gui", true, false, true); //
+	buyMenu->SetStateString("field_credits", "0");
+	buyMenu->SetStateBool("gameDraw", true);
+	costs.SetInt("weapon_shotgun", 100);
+	buyMenu->SetStateInt("price_shotgun", GetItemCost("weapon_shotgun"));
+	buyMenu->SetStateInt("price_hyperblaster", GetItemCost("weapon_hyperblaster"));
+	buyMenu->SetStateInt("price_grenadelauncher", GetItemCost("weapon_grenadelauncher"));
+	buyMenu->SetStateInt("price_nailgun", GetItemCost("weapon_nailgun"));
+	buyMenu->SetStateInt("price_rocketlauncher", GetItemCost("weapon_rocketlauncher"));
+	buyMenu->SetStateInt("price_railgun", GetItemCost("weapon_railgun"));
+	buyMenu->SetStateInt("price_lightninggun", GetItemCost("weapon_lightninggun"));
+	//			buyMenu->SetStateInt( "price_dmg", GetItemCost( "weapon_dmg" ) );
+	buyMenu->SetStateInt("price_napalmgun", GetItemCost("weapon_napalmgun"));
 
+	buyMenu->SetStateInt("price_lightarmor", GetItemCost("item_armor_small"));
+	buyMenu->SetStateInt("price_heavyarmor", GetItemCost("item_armor_large"));
+	buyMenu->SetStateInt("price_ammorefill", GetItemCost("ammorefill"));
+
+	buyMenu->SetStateInt("price_special0", GetItemCost("ammo_regen"));
+	buyMenu->SetStateInt("price_special1", GetItemCost("health_regen"));
+	buyMenu->SetStateInt("price_special2", GetItemCost("damage_boost"));
+
+
+	buyMenu->SetStateInt("playerTeam", team);
+
+	if (weapon)
+		buyMenu->SetStateString("ammoIcon", weapon->spawnArgs.GetString("inv_icon"));
+
+	buyMenu->SetStateInt("player_weapon", GetCurrentWeapon());
+	//gameLocal.mpGame.SetupBuyMenuItems();
+	UpdateHudStats(buyMenu);
+	buyMenuCash = 0;
+	buyMenu->Activate(true, gameLocal.time);
+	mainMenu = gameLocal.mpGame.mainGui;
+	//idDict  test;
+	//test.Set("classname", "weapon_hyperblaster");
+	//test.Set("origin", "6293 2200 -10");
+	//gameLocal.SpawnEntityDef(test);
 	if ( entityNumber >= MAX_CLIENTS ) {
 		gameLocal.Error( "entityNum > MAX_CLIENTS for player.  Player may only be spawned with a client." );
 	}
@@ -1875,6 +1865,7 @@ void idPlayer::Spawn( void ) {
 	// allow thinking during cinematics
 	cinematic = true;
 
+	//gameLocal.Printf("bosshealth%d/n", bossEnemy->health);
 	if ( gameLocal.isMultiplayer ) {
 		// always start in spectating state waiting to be spawned in
 		// do this before SetClipModel to get the right bounding box
@@ -2115,10 +2106,20 @@ void idPlayer::Spawn( void ) {
 	carryOverCurrentWeapon = currentWeapon;
 	inventory.carryOverWeapons = 0;
 //RITUAL END
+	bossEnemy = gameLocal.FindEntity("base");
 
+	idUserInterface *hud_ = GetHud();
+	if (hud_) {
+		hud_->SetStateInt("boss_maxhealth", bossEnemy->health);
+		hud_->HandleNamedEvent("showBossBar");
+		//maxBossHealth = bossEnemy->health;
+	}
 	itemCosts = static_cast< const idDeclEntityDef * >( declManager->FindType( DECL_ENTITYDEF, "ItemCostConstants", false ) );
+	
 }
-
+int idPlayer::getMaxBossHealth() {
+	return maxBossHealth;
+}
 /*
 ==============
 idPlayer::~idPlayer()
@@ -2135,7 +2136,7 @@ idPlayer::~idPlayer() {
 	delete weaponWorldModel;
 	delete weapon;
 	delete aasSensor;
-	
+	//delete hud;
 	SetPhysics( NULL );
 }
 
@@ -3453,7 +3454,7 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	int temp;
 	
 	assert ( _hud );
-
+	//gameLocal.Printf("basehealth%d", bossEnemy->health);
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
 		_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
@@ -5407,7 +5408,7 @@ void idPlayer::GiveItem( const char *itemname ) {
 
 	if ( gameLocal.mpGame.IsBuyingAllowedInTheCurrentGameMode() ) {
 		// check if this is a weapon
-		if( !idStr::Icmpn( itemname, "weapon_", 7 ) ) {
+		if( !idStr::Icmpn( itemname, "weapon_", 7 )  ){
 			int weaponIndex = SlotForWeapon( itemname );
 			if( weaponIndex >= 0 && weaponIndex < MAX_WEAPONS )
 			{
@@ -6404,7 +6405,7 @@ void idPlayer::UpdateWeapon( void ) {
 		return;
 	} else if ( focusType == FOCUS_CHARACTER) {
 		flagCanFire = false;
-		Weapon_NPC();
+		//Weapon_NPC();
 	} else if ( focusType == FOCUS_VEHICLE ) {
 		flagCanFire = false;
 		Weapon_Vehicle();
@@ -7125,7 +7126,7 @@ void idPlayer::UpdateFocus( void ) {
 						gameLocal.TracePoint( this, renderTrace, start, end, MASK_SHOT_RENDERMODEL, this );
 					}
 					if ( ( renderTrace.fraction < 1.0f ) && ( renderTrace.c.entityNum == ent->entityNumber ) ) {
-						SetFocus ( FOCUS_CHARACTER, FOCUS_TIME, body, NULL );
+						//SetFocus ( FOCUS_CHARACTER, FOCUS_TIME, body, NULL );
 						if ( focusLength < 80.0f ) {
 							talkCursor = 1;
 						}
@@ -7143,7 +7144,7 @@ void idPlayer::UpdateFocus( void ) {
 						gameLocal.TracePoint( this, renderTrace, start, end, MASK_SHOT_RENDERMODEL, this );
 					}
 					if ( ( renderTrace.fraction < 1.0f ) && ( renderTrace.c.entityNum == ent->entityNumber ) ) {
-						SetFocus ( FOCUS_CHARACTER, FOCUS_TIME, ent, NULL );
+						//SetFocus ( FOCUS_CHARACTER, FOCUS_TIME, ent, NULL );
 						if ( focusLength < 80.0f ) {
 							talkCursor = 1;
 						}
@@ -8286,7 +8287,7 @@ int GetItemBuyImpulse( const char* itemName )
 		{ "weapon_rocketlauncher",			IMPULSE_105, },
 		{ "weapon_railgun",					IMPULSE_106, },
 		{ "weapon_lightninggun",			IMPULSE_107, },
-		//									IMPULSE_108 - Unused
+	//{"turret",									IMPULSE_108},
 		{ "weapon_napalmgun",				IMPULSE_109, },
 		//		{ "weapon_dmg",						IMPULSE_110, },
 		//									IMPULSE_111 - Unused
@@ -8328,64 +8329,85 @@ bool idPlayer::CanBuyItem( const char* itemName )
 }
 
 
-itemBuyStatus_t idPlayer::ItemBuyStatus( const char* itemName )
+itemBuyStatus_t idPlayer::ItemBuyStatus(const char* itemName)
 {
+	idEntity * base;
+	idVec3 base_p;
+	base = gameLocal.FindEntity("base");
+	idVec3 player_p;
+	player_p = gameLocal.GetLocalPlayer()->GetPhysics()->GetOrigin();
+	
+	if (base != NULL) {
+		base_p = base->GetPhysics()->GetOrigin();
+		float dist = player_p.Dist(base_p);
+		gameLocal.Printf("%f\n", dist);
+		if (dist > 250)
+			return IBS_NOT_ALLOWED;
+	}
 	idStr itemNameStr = itemName;
-	if ( itemNameStr == "notimplemented" )
+	if (itemNameStr == "notimplemented")
 	{
 		return IBS_NOT_ALLOWED;
 	}
-	else if( !idStr::Cmpn( itemName, "wpmod_", 6 ) )
+	else if (!idStr::Cmpn(itemName, "wpmod_", 6))
 	{
 		return IBS_NOT_ALLOWED;
 	}
-	else if( itemNameStr == "item_armor_small" )
+	else if (itemNameStr == "item_armor_small")
 	{
-		if( inventory.armor >= 190 )
+		if (inventory.armor >= 190)
 			return IBS_ALREADY_HAVE;
 
-		if( inventory.carryOverWeapons & CARRYOVER_FLAG_ARMOR_LIGHT )
+		if (inventory.carryOverWeapons & CARRYOVER_FLAG_ARMOR_LIGHT)
 			return IBS_ALREADY_HAVE;
 
-		if( PowerUpActive( POWERUP_SCOUT ) )
+		if (PowerUpActive(POWERUP_SCOUT))
 			return IBS_NOT_ALLOWED;
 	}
-	else if( itemNameStr == "item_armor_large" )
+	else if (itemNameStr == "item_armor_large")
 	{
-		if( inventory.armor >= 190 )
+		if (inventory.armor >= 190)
 			return IBS_ALREADY_HAVE;
 
-		if( inventory.carryOverWeapons & CARRYOVER_FLAG_ARMOR_HEAVY )
+		if (inventory.carryOverWeapons & CARRYOVER_FLAG_ARMOR_HEAVY)
 			return IBS_ALREADY_HAVE;
 
-		if( PowerUpActive( POWERUP_SCOUT ) )
+		if (PowerUpActive(POWERUP_SCOUT))
 			return IBS_NOT_ALLOWED;
 	}
-	else if( itemNameStr == "ammorefill" )
+	else if (itemNameStr == "ammorefill")
 	{
-		if( inventory.carryOverWeapons & CARRYOVER_FLAG_AMMO )
+		if (inventory.carryOverWeapons & CARRYOVER_FLAG_AMMO)
 			return IBS_ALREADY_HAVE;
 
 		// If we are full of ammo for all weapons, you can't buy the ammo refill anymore.
 		bool fullAmmo = true;
-		for ( int i = 0 ; i < MAX_AMMOTYPES; i++ )
+		for (int i = 0; i < MAX_AMMOTYPES; i++)
 		{
-			if ( inventory.ammo[i] != inventory.MaxAmmoForAmmoClass( this, rvWeapon::GetAmmoNameForIndex(i) ) )
+			if (inventory.ammo[i] != inventory.MaxAmmoForAmmoClass(this, rvWeapon::GetAmmoNameForIndex(i)))
 				fullAmmo = false;
 		}
-		if ( fullAmmo )
+		if (fullAmmo)
 			return IBS_NOT_ALLOWED;
 	}
-	else if ( itemNameStr == "fc_armor_regen" )
+	else if (itemNameStr == "fc_armor_regen")
 	{
 		return IBS_NOT_ALLOWED;
 	}
 
-	
 
-	if ( CanSelectWeapon(itemName) != -1 )
-		return IBS_ALREADY_HAVE;
 
+	if (CanSelectWeapon(itemName) != -1)
+		if (inventory.AmmoIndexForWeaponClass(itemName) < inventory.MaxAmmoForAmmoClass(this, inventory.AmmoClassForWeaponClass(itemName))){
+			int cost = GetItemCost(itemName);
+			if (cost > (int)buyMenuCash)
+			{
+				return IBS_CANNOT_AFFORD;
+			}
+			return IBS_CAN_BUY;
+		}
+		else
+			return IBS_ALREADY_HAVE;
 	int cost = GetItemCost(itemName);
 	if ( cost > (int)buyMenuCash )
 	{
@@ -8498,7 +8520,7 @@ bool idPlayer::AttemptToBuyItem( const char* itemName )
 	buyMenuCash -= (float)itemCost;
 	inventory.money = buyMenuCash;
 	common->DPrintf( "Player %s just bought item %s; player now has %d (%g) credits, cost was %d\n", playerName, itemName, (int)buyMenuCash, buyMenuCash, itemCost );
-
+	hud->SetStateString("field_credits", va("%i", (int)buyMenuCash));
 
 	// Team-based effects
 	idStr itemNameStr = itemName;
@@ -8685,7 +8707,7 @@ void idPlayer::PerformImpulse( int impulse ) {
 		case IMPULSE_105:	AttemptToBuyItem( "weapon_rocketlauncher" );		break;
 		case IMPULSE_106:	AttemptToBuyItem( "weapon_railgun" );				break;
 		case IMPULSE_107:	AttemptToBuyItem( "weapon_lightninggun" );			break;
-		case IMPULSE_108:	break; // Unused
+		case IMPULSE_108:							break; // Unused
 		case IMPULSE_109:	AttemptToBuyItem( "weapon_napalmgun" );				break;
 		case IMPULSE_110:	/* AttemptToBuyItem( "weapon_dmg" );*/				break;
 		case IMPULSE_111:	break; // Unused
@@ -9688,7 +9710,8 @@ void idPlayer::Think( void ) {
 	} else if ( health > 0 && !gameLocal.inCinematic ) {
 		UpdateWeapon();
 	}
-
+	//rvWeaponLightningGun lg;
+	//lg.Pew();
 	UpdateAir();
 	
 	UpdateHud();
@@ -9773,6 +9796,8 @@ void idPlayer::Think( void ) {
 		inBuyZone = false;
 
 	inBuyZonePrev = false;
+
+	
 }
 
 /*

@@ -374,7 +374,10 @@
     <ClCompile Include="game\weapon\WeaponRocketLauncher.cpp" />
     <ClCompile Include="game\weapon\WeaponShotgun.cpp" />
     <ClCompile Include="game\WorldSpawn.cpp" />
+    <ClCompile Include="LightningFence.cpp" />
+    <ClCompile Include="Source.cpp" />
     <ClCompile Include="WaveSpawn.cpp" />
+    <ClCompile Include="WeaponIceGun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\Actor.h" />
